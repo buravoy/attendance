@@ -7,7 +7,7 @@ import {Plus} from "@element-plus/icons-vue";
 const store = useStore();
 
 const isShow = shallowRef(false);
-const groupColor = shallowRef('#1d1e1f');
+const groupColor = shallowRef('rgb(44.8, 45.4, 46.6');
 
 const groupName = shallowRef('')
 const groupDescription = shallowRef('')
@@ -24,7 +24,7 @@ const addNew = async () => {
 
   groupName.value = '';
   groupDescription.value = '';
-  groupColor.value = '#1d1e1f';
+  groupColor.value = 'rgb(44.8, 45.4, 46.6';
 
   ElMessage({
     message: `Создана группа ${groupName.value}`,
@@ -56,7 +56,7 @@ const addNew = async () => {
       <div class="item">
         <label>Примечание</label>
         <div class="d-flex align-items-center justify-content-start">
-          <el-input v-model="groupDescription" type="textarea" :autosize="{minRows: 3, maxRows: 9}" size="large"/>
+          <el-input v-model="groupDescription" type="textarea" :autosize="{minRows: 3, maxRows: 5}" size="large"/>
         </div>
       </div>
     </template>
@@ -70,10 +70,6 @@ const addNew = async () => {
 </template>
 
 <style scoped lang="scss">
-.add-new {
-  //width: 100%;
-}
-
 .item {
   label {
     display: block;

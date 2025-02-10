@@ -53,7 +53,7 @@ const centerDialogVisible = ref(false)
 .group-item {
   display: flex;
   border-radius: 4px;
-  margin: 5px 20px 15px;
+  margin: 15px 20px 15px;
   overflow: hidden;
   border: 1px solid transparent;
 
@@ -66,8 +66,8 @@ const centerDialogVisible = ref(false)
   }
 
   &.bordered {
-    border-color: var(--el-bg-color-overlay);
-    background-color: var(--el-bg-color-overlay);
+    border-color: var(--el-color-info-light-8);
+    background-color: var(--el-color-info-light-8);
   }
 }
 

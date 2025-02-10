@@ -21,7 +21,7 @@ export const useStore = defineStore('Store', {
     keys: keys,
     groups: groups,
     order: order ?? keys,
-    title: "Extn",
+    title: "Группы",
   }),
 
   actions: {

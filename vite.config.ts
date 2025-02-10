@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 5566
+    port: 5566,
+    allowedHosts: ['rburakevich.tecel.ru']
   }
 })

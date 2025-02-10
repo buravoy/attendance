@@ -1,17 +1,19 @@
 <script setup lang="ts">
-
-import NewGroup from "./NewGroup.vue";
 import Groups from "./Groups.vue";
+import {ElScrollbar} from "element-plus";
 
 </script>
 
 <template>
-
-  <Groups/>
-
-
+  <el-scrollbar class="scroll">
+    <main>
+      <Groups/>
+    </main>
+  </el-scrollbar>
 </template>
 
 <style scoped lang="scss">
-
+.scroll {
+  height: calc(100vh - var(--at-header-height) - 1px);
+}
 </style>

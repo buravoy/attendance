@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {ElIcon} from "element-plus";
 import {Back} from "@element-plus/icons-vue";
 import NewGroup from "./NewGroup.vue";
 
@@ -11,18 +10,36 @@ defineProps({
 
 <template>
   <header class="pe-3">
-    <el-icon :size="20">
-      <Back />
-    </el-icon>
-    <p>{{ title }}</p>
+    <div class="back">
+      <Back class="icon"/>
+    </div>
+    <div class="d-flex align-items-center justify-content-start">
+      <h4>{{ title }}</h4>
+    </div>
     <NewGroup />
   </header>
 </template>
 
 <style scoped lang="scss">
+.icon {
+  width: 20px;
+  height: 20px;
+  z-index: 1;
+}
+
+h4 {
+  color: rgb(114, 118, 123);
+}
 header {
-  height: 60px;
+  height: var(--at-header-height);
   display: flex;
   align-items: center;
+  background-color: var(--el-color-primary-light-9);
+}
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--at-header-height);
 }
 </style>
