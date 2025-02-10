@@ -3,39 +3,38 @@ import {IndexDb} from "./indexDb.ts";
 import {toRaw} from "vue";
 
 const idb = new IndexDb('attendance', 'groups');
+const keys: string[] = await idb.keys();
+const order = await idb.get('_order');
+const groups: { [key: string]: any } = {};
 
-const keys = await idb.keys();
-const groups = await Promise.all(keys.map(async k => await idb.get(k)));
+if (order) {
+  const i = keys.findIndex(k => k == '_order');
+  if (i >= 0) keys.splice(i, 1);
+}
 
-// const groups = keys.map(async (k) => {
-//   console.log(k)
-//   return await idb.get(k);
-// })
+for (const k of keys) {
+  groups[k] = await idb.get(k);
+}
 
 export const useStore = defineStore('Store', {
   state: () => ({
-    iDb: idb,
+    keys: keys,
     groups: groups,
+    order: order ?? keys,
     title: "Extn",
   }),
 
   actions: {
-    async refresh() {
+    async changeOrder() {
+      await idb.set('_order', toRaw(this.order));
+    },
 
-
-      for (const g of this.groups) {
-        console.log(g.key, toRaw(g))
-        await idb.del(g.key);
-      }
-
-      setTimeout(async () => {
-        for (const g of this.groups) {
-          await idb.set(g.key, toRaw(g));
-        }
-      }, 10000)
-
-
-
-    }
+    async addGroup(data: any) {
+      const groupId = Date.now().toString(16);
+      this.groups[groupId] = data;
+      this.order.push(groupId);
+      await this.changeOrder();
+      await idb.set(groupId, data);
+    },
   },
 })

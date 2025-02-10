@@ -7,25 +7,24 @@ import {Plus} from "@element-plus/icons-vue";
 const store = useStore();
 
 const isShow = shallowRef(false);
-const groupColor = shallowRef('#409EFF');
+const groupColor = shallowRef('#1d1e1f');
 
 const groupName = shallowRef('')
 const groupDescription = shallowRef('')
 
 const addNew = async () => {
-  const groupId = Date.now().toString(16);
-
-  const groupData = {
-    key: groupId,
+  await store.addGroup({
     meta: {
       name: groupName.value,
       desc: groupDescription.value,
       color: groupColor.value,
     },
     students: [],
-  }
+  })
 
-  await store.iDb.set(groupId, groupData);
+  groupName.value = '';
+  groupDescription.value = '';
+  groupColor.value = '#1d1e1f';
 
   ElMessage({
     message: `Создана группа ${groupName.value}`,
@@ -34,13 +33,12 @@ const addNew = async () => {
   });
 
   isShow.value = false;
-  await store.refresh();
 }
 
 </script>
 
 <template>
-  <el-button type="primary" size="large" :icon="Plus" @click="isShow = true" class="ms-auto" plain/>
+  <el-button type="primary" size="large" :icon="Plus" @click="isShow = true" class="ms-auto" plain circle/>
 
   <el-drawer v-model="isShow" size="100%">
     <template #header>
@@ -51,7 +49,7 @@ const addNew = async () => {
         <label>Наименование</label>
         <div class="d-flex align-items-center justify-content-start">
           <el-input v-model="groupName" class="me-2" placeholder="Новая группа" size="large"/>
-          <el-color-picker v-model="groupColor" size="large"/>
+          <el-color-picker v-model="groupColor" size="large" :predefine="['#409eff', '#6610f2', '#d63384']" />
         </div>
       </div>
 

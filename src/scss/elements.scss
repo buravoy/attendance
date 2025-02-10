@@ -7,6 +7,12 @@
 @use 'element-plus/theme-chalk/el-color-picker.css';
 @use 'element-plus/theme-chalk/el-text.css';
 @use 'element-plus/theme-chalk/el-message.css';
+@use 'element-plus/theme-chalk/el-dropdown.css';
+@use 'element-plus/theme-chalk/el-dropdown-menu.css';
+@use 'element-plus/theme-chalk/el-dropdown-item.css';
+@use 'element-plus/theme-chalk/el-dialog.css';
+@use 'element-plus/theme-chalk/el-overlay.css';
+@use 'element-plus/theme-chalk/el-popper.css';
 
 .el-message {
   min-width: 300px;

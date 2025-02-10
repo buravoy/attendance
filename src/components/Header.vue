@@ -22,7 +22,6 @@ defineProps({
 <style scoped lang="scss">
 header {
   height: 60px;
-  background: #1a1a1a;
   display: flex;
   align-items: center;
 }

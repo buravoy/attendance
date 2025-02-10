@@ -1,39 +1,50 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {useStore} from "../stores";
-import {DCaret, MoreFilled} from "@element-plus/icons-vue";
-import {ElButton} from "element-plus";
+import {Delete, Edit, MoreFilled} from "@element-plus/icons-vue";
+import {ElButton, ElDialog, ElDropdown, ElDropdownItem, ElDropdownMenu} from "element-plus";
+import {ref} from "vue";
 
-const props = defineProps({
+defineProps({
   data: Object,
 })
 
-// const data = ref();
-const store = useStore();
+const centerDialogVisible = ref(false)
 
-onMounted(async () => {
-  // data.value = await store.iDb.get(props.id);
-})
 </script>
 
 <template>
-  <div class="group-item mx-3">
+  <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}" :style="{backgroundColor: data?.meta?.color}">
 
     <div class="group-info">
-      {{data}}
-
       <p class="title">{{data?.meta?.name}}</p>
-      <p class="desc">{{data?.meta?.desc}}</p>
-      <p>{{data?.students?.length}}</p>
+      <p class="desc mb-1">{{data?.meta?.desc}}</p>
+      <p class="count"><span class="count-desc me-1">Студентов в группе:</span> <b>{{data?.students?.length}}</b></p>
     </div>
 
-    <div class="group-control">
-      <el-button :icon="MoreFilled" circle />
+    <el-dropdown placement="top-start" class="ms-auto" trigger="click">
+      <div class="group-control">
+        <MoreFilled class="icon" size="24"/>
+      </div>
 
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item :icon="Edit">Редактировать</el-dropdown-item>
+          <el-dropdown-item @click="centerDialogVisible = true" :icon="Delete" divided style="color: var(--el-color-error)">Удалить группу</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
 
-
-    </div>
+      <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center>
+        <div>Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="centerDialogVisible = false">Отмена</el-button>
+            <el-button type="danger" @click="centerDialogVisible = false">Удалить</el-button>
+          </div>
+        </template>
+      </el-dialog>
   </div>
+
+
 
 
 </template>
@@ -41,20 +52,72 @@ onMounted(async () => {
 <style scoped lang="scss">
 .group-item {
   display: flex;
-  border: 1px solid;
   border-radius: 4px;
-  margin: 5px 20px;
+  margin: 5px 20px 15px;
+  overflow: hidden;
+  border: 1px solid transparent;
+
+  &.sortable-chosen:not(.sortable-ghost) {
+    filter: brightness(1.2);
+  }
+
+  &.sortable-chosen.sortable-ghost {
+    filter: brightness(0.5);
+  }
+
+  &.bordered {
+    border-color: var(--el-bg-color-overlay);
+    background-color: var(--el-bg-color-overlay);
+  }
 }
 
 .group-control {
   display: flex;
   flex-direction: column;
-  margin-left: auto;
+  color: white;
+  width: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  position: relative;
+  align-items: center;
+  justify-content: center;
+
+  &:before {
+    position: absolute;
+    content: '';
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
 }
 
 .icon {
-  width: 1em;
-  height: 1em;
-  margin-right: 8px
+  width: 20px;
+  height: 20px;
+  z-index: 1;
+}
+
+.group-info {
+  padding: 5px;
+  max-width: calc(100% - 50px);
+}
+
+.title {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.desc {
+  opacity: .7;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.count {
+  font-size: 14px;
+}
+
+.count-desc {
+  opacity: .7;
 }
 </style>
