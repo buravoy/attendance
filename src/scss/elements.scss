@@ -1,0 +1,30 @@
+@use 'element-plus/theme-chalk/base.css';
+@use 'element-plus/theme-chalk/dark/css-vars.css';
+@use 'element-plus/theme-chalk/el-drawer.css';
+@use 'element-plus/theme-chalk/el-icon.css';
+@use 'element-plus/theme-chalk/el-button.css';
+@use 'element-plus/theme-chalk/el-input.css';
+@use 'element-plus/theme-chalk/el-color-picker.css';
+@use 'element-plus/theme-chalk/el-text.css';
+@use 'element-plus/theme-chalk/el-message.css';
+
+.el-message {
+  min-width: 300px;
+
+  .el-message__icon {
+    display: none;
+  }
+
+  .el-message__closeBtn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .el-message__content {
+    white-space: pre-line;
+    line-height: 18px;
+    padding-right: 15px;
+  }
+}
