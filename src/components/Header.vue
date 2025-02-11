@@ -13,7 +13,7 @@ const store = useStore();
       <Back class="icon"/>
     </div>
     <div class="title" :class="{'ms-3': !store.backCb}">
-      <h4>{{ store.title }}</h4>
+      <h4>{{ store.title }} {{`${!store.currentGroup ? '(' + store.order.length + ')' : '(' + store.currentGroup.students.length + ')'}`}}</h4>
       <p v-if="store.desc">{{store.desc}}</p>
     </div>
     <div class="control ms-auto">
