@@ -36,7 +36,7 @@ const centerDialogVisible = ref(false)
     </el-dropdown>
 
     <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center>
-      <div>Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
+      <div class="text-center" style="line-height: 28px">Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="centerDialogVisible = false">Отмена</el-button>

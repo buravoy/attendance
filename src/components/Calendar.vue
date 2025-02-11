@@ -1,8 +1,9 @@
 <script setup lang="ts">
 
-import {ElButton, ElDialog, ElMessage, ElRadio, ElRadioGroup, ElScrollbar} from "element-plus";
-import {CaretLeft, CaretRight} from "@element-plus/icons-vue";
+import {ElButton, ElDialog, ElRadio, ElRadioGroup, ElScrollbar} from "element-plus";
+import {CaretLeft, CaretRight, Delete} from "@element-plus/icons-vue";
 import {ref, shallowRef} from "vue";
+import {useStore} from "../stores";
 
 const props = defineProps({
   student: Object,
@@ -14,6 +15,7 @@ const currentDate = ref(new Date());
 const events = shallowRef(['Н', '1', '2', '3', '4', '5']);
 const currentEvent = shallowRef('Н')
 const emit = defineEmits(['addEvent']);
+const store = useStore();
 
 const makeDate = (month: number, year: number, day: number) => {
   return new Date(`${year}-${month}-${day}`)
@@ -73,7 +75,10 @@ const addEvent = () => {
 }
 
 const removeEvent = (key: number) => {
-  props.student?.attendance.splice(key, 1);
+  if (!eventDate.value) return;
+
+  props.student?.attendance[eventDate.value.toLocaleDateString()].splice(key, 1);
+  store.syncGroup();
 }
 </script>
 
@@ -104,7 +109,9 @@ const removeEvent = (key: number) => {
           </div>
 
           <div class="event">
-            qw
+            <div v-for="est in student?.attendance[makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day).toLocaleDateString()]"
+                 class="est" :class="{red: est == 'Н'}"
+            >{{est}}</div>
           </div>
         </div>
       </div>
@@ -117,16 +124,17 @@ const removeEvent = (key: number) => {
       day: 'numeric'
     })" destroy-on-close center :close-on-click-modal="false" :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
     >
-      <div>
-        <div v-for="(est, key) in student?.attendance">{{ est }} {{key}}
-
-
-
-          <el-button @click="removeEvent(key)">ss</el-button>
-
+      <div v-if="eventDate">
+        <div>
+          <div v-for="(est, key) in student?.attendance[eventDate.toLocaleDateString()]" class="estimate">
+            <div>{{ est }}</div>
+            <el-button @click="removeEvent(key)" :icon="Delete" text type="danger"/>
+          </div>
         </div>
 
-        <div class="d-flex flex-column justify-content-center align-items-center">
+
+
+        <div class="d-flex flex-column justify-content-center align-items-center mt-4">
           <el-radio-group v-model="currentEvent" class="d-flex align-items-center">
             <el-radio v-for="(est, k) in events" :value="est" size="large"
                       class="d-flex flex-column justify-content-center align-items-center"
@@ -147,6 +155,28 @@ const removeEvent = (key: number) => {
 </template>
 
 <style scoped lang="scss">
+.estimate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 50px;
+}
+
+.event {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-height: 10px;
+  .est {
+    width: 100%;
+    text-align: center;
+  }
+
+  .red {
+    background-color: var(--el-color-error);
+  }
+}
+
 :deep(.today) {
   background-color: var(--el-color-primary-light-8);;
 }
@@ -154,6 +184,7 @@ const removeEvent = (key: number) => {
 .day-name {
   white-space: nowrap;
   font-weight: 600;
+  padding: 0 5px;
   span {
     opacity: 0.7;
     font-weight: 500;
@@ -179,8 +210,6 @@ const removeEvent = (key: number) => {
 }
 
 .day {
-  padding: 0 5px;
-
   &:not(:last-child) {
     border-right: 1px solid var(--el-color-info-light-3);
   }

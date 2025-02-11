@@ -7,7 +7,7 @@ import {Plus} from "@element-plus/icons-vue";
 const store = useStore();
 
 const isShow = shallowRef(false);
-const groupColor = shallowRef('#2c2d2e');
+const groupColor = shallowRef<string | undefined>('#2c2d2e');
 
 const groupName = shallowRef('')
 const groupDescription = shallowRef('')
@@ -51,6 +51,7 @@ const addNew = async () => {
           <el-input v-model="groupName" class="me-2" placeholder="Новая группа" size="large"/>
           <el-color-picker v-model="groupColor"
                            size="large"
+                           @activeChange="(val) => groupColor = val!"
                            :predefine="['#2c2d2e', '#409eff', '#6f42c1', '#d63384', '#67c23a', '#fd7e14', '#ffc107', '#20c997', '#0dcaf0']"
           />
         </div>
