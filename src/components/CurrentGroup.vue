@@ -38,6 +38,9 @@ const addEstToStudent = (key: number, data: any) => {
         <Calendar :student="student" @addEvent="(data) => addEstToStudent(key, data)"/>
       </el-collapse-item>
     </el-collapse>
+    <div v-else class="text-center p-5">
+      В группе нет студентов
+    </div>
   </div>
 </template>
 

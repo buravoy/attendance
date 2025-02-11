@@ -5,6 +5,8 @@ import GroupItem from "./GroupItem.vue";
 import {nextTick, onMounted} from "vue";
 const store = useStore();
 
+
+
 onMounted(() => {
   nextTick(() => {
     store.scrollRef?.scrollTo({top: store.scroll});
@@ -13,9 +15,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <Draggable :list="store.order" @change="store.changeOrder()" :delay="500" :animation="500">
-    <GroupItem v-for="item in store.order" :data="store.groups[item]" :key="item" @open="store.openGroup(item)"/>
+  <Draggable v-if="store.order.length" :list="store.order" @change="store.changeOrder()" :delay="500" :animation="500">
+    <GroupItem v-for="item in store.order" :data="store.groups[item]" :key="item" @open="store.openGroup(item)" @remove="store.deleteGroup(item)"/>
   </Draggable>
+  <div v-else class="text-center p-5">
+    Групп нет
+  </div>
 </template>
 
 <style scoped lang="scss">

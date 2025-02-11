@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {shallowRef} from "vue";
+import {ref, shallowRef} from "vue";
 import {ElButton, ElDrawer, ElInput, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Plus} from "@element-plus/icons-vue";
 
 const store = useStore();
-
+const inputRef = ref();
 const isShow = shallowRef(false);
 
 const studentName = shallowRef('')
@@ -35,12 +35,16 @@ const addStudent = async () => {
   });
 }
 
+const onOpen = () => {
+  setTimeout(inputRef.value?.focus, 200);
+}
+
 </script>
 
 <template>
   <el-button size="large" :icon="Plus" @click="isShow = true" plain circle class="add-student"/>
 
-  <el-drawer v-model="isShow" size="100%">
+  <el-drawer v-model="isShow" size="100%" @opened="onOpen">
     <template #header>
       <div class="title">
         <h4>Добавление студентов</h4>
@@ -53,7 +57,7 @@ const addStudent = async () => {
       <div class="item mb-2">
         <label>Фамилия <span class="required">*</span></label>
         <div class="d-flex align-items-center justify-content-start">
-          <el-input v-model="studentSurname" size="large"/>
+          <el-input ref="inputRef" v-model="studentSurname" size="large"/>
         </div>
       </div>
 

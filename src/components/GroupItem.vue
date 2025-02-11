@@ -3,7 +3,7 @@ import {Delete, Edit, MoreFilled} from "@element-plus/icons-vue";
 import {ElButton, ElDialog, ElDropdown, ElDropdownItem, ElDropdownMenu} from "element-plus";
 import {ref} from "vue";
 
-const emit = defineEmits(['open']);
+const emit = defineEmits(['open', 'remove']);
 
 defineProps({
   data: Object,
@@ -11,6 +11,10 @@ defineProps({
 
 const centerDialogVisible = ref(false)
 
+const deleteGroup = () => {
+  centerDialogVisible.value = false;
+  emit('remove');
+}
 </script>
 
 <template>
@@ -40,7 +44,7 @@ const centerDialogVisible = ref(false)
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="centerDialogVisible = false">Отмена</el-button>
-          <el-button type="danger" @click="centerDialogVisible = false">Удалить</el-button>
+          <el-button type="danger" @click="deleteGroup">Удалить</el-button>
         </div>
       </template>
     </el-dialog>
