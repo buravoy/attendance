@@ -17,7 +17,7 @@ const addStudent = async () => {
     name: studentName.value,
     surname: studentSurname.value,
     patroname: studentPatroname.value,
-    attendance: [],
+    attendance: {},
   }
 
   store.currentGroup.students.push(data);
