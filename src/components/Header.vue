@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import {Back} from "@element-plus/icons-vue";
 import NewGroup from "./NewGroup.vue";
+import {useStore} from "../stores";
+import NewStudent from "./NewStudent.vue";
 
-defineProps({
-  title: String
-})
-
+const store = useStore();
 </script>
 
 <template>
-  <header class="pe-3">
-    <div class="back">
+  <header :style="{backgroundColor: store.currentGroup?.meta.color}">
+    <div v-if="store.backCb" class="back" @click="store.backCb()">
       <Back class="icon"/>
     </div>
-    <div class="d-flex align-items-center justify-content-start">
-      <h4>{{ title }}</h4>
+    <div class="title" :class="{'ms-3': !store.backCb}">
+      <h4>{{ store.title }}</h4>
+      <p v-if="store.desc">{{store.desc}}</p>
     </div>
-    <NewGroup />
+    <div class="control ms-auto">
+      <NewGroup v-if="!store.currentGroup"/>
+      <NewStudent v-if="store.currentGroup"/>
+    </div>
   </header>
 </template>
 
@@ -27,19 +30,45 @@ defineProps({
   z-index: 1;
 }
 
-h4 {
-  color: rgb(114, 118, 123);
-}
+
 header {
   height: var(--at-header-height);
   display: flex;
   align-items: center;
   background-color: var(--el-color-primary-light-9);
 }
-.back {
+
+
+.back, .control {
   display: flex;
   align-items: center;
   justify-content: center;
   width: var(--at-header-height);
+  min-width: var(--at-header-height);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: calc(100vw - var(--at-header-height) - var(--at-header-height));
+
+  h4 {
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  p {
+    font-size: 12px;
+    margin-top: 3px;
+    color: var(--el-color-info-light-3);
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 </style>

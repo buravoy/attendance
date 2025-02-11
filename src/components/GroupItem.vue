@@ -3,6 +3,8 @@ import {Delete, Edit, MoreFilled} from "@element-plus/icons-vue";
 import {ElButton, ElDialog, ElDropdown, ElDropdownItem, ElDropdownMenu} from "element-plus";
 import {ref} from "vue";
 
+const emit = defineEmits(['open']);
+
 defineProps({
   data: Object,
 })
@@ -14,7 +16,7 @@ const centerDialogVisible = ref(false)
 <template>
   <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}" :style="{backgroundColor: data?.meta?.color}">
 
-    <div class="group-info">
+    <div class="group-info" @click="emit('open')">
       <p class="title">{{data?.meta?.name}}</p>
       <p class="desc mb-1">{{data?.meta?.desc}}</p>
       <p class="count"><span class="count-desc me-1">Студентов в группе:</span> <b>{{data?.students?.length}}</b></p>
@@ -33,15 +35,15 @@ const centerDialogVisible = ref(false)
       </template>
     </el-dropdown>
 
-      <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center>
-        <div>Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
-        <template #footer>
-          <div class="dialog-footer">
-            <el-button @click="centerDialogVisible = false">Отмена</el-button>
-            <el-button type="danger" @click="centerDialogVisible = false">Удалить</el-button>
-          </div>
-        </template>
-      </el-dialog>
+    <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center>
+      <div>Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">Отмена</el-button>
+          <el-button type="danger" @click="centerDialogVisible = false">Удалить</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 
 
@@ -76,7 +78,7 @@ const centerDialogVisible = ref(false)
   flex-direction: column;
   color: white;
   width: 50px;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--el-mask-color-extra-light);
   position: relative;
   align-items: center;
   justify-content: center;

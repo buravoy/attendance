@@ -38,7 +38,7 @@ const addNew = async () => {
 </script>
 
 <template>
-  <el-button type="primary" size="large" :icon="Plus" @click="isShow = true" class="ms-auto" plain circle/>
+  <el-button type="primary" size="large" :icon="Plus" @click="isShow = true" plain circle />
 
   <el-drawer v-model="isShow" size="100%">
     <template #header>
@@ -49,7 +49,7 @@ const addNew = async () => {
         <label>Наименование</label>
         <div class="d-flex align-items-center justify-content-start">
           <el-input v-model="groupName" class="me-2" placeholder="Новая группа" size="large"/>
-          <el-color-picker v-model="groupColor" size="large" :predefine="['#409eff', '#6610f2', '#d63384']" />
+          <el-color-picker v-model="groupColor" size="large" :predefine="['#409eff', '#6610f2', '#d63384', '#67c23a']" />
         </div>
       </div>
 

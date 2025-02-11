@@ -14,6 +14,9 @@
 @use 'element-plus/theme-chalk/el-overlay.css';
 @use 'element-plus/theme-chalk/el-popper.css';
 @use 'element-plus/theme-chalk/el-scrollbar.css';
+@use 'element-plus/theme-chalk/el-collapse.css';
+@use 'element-plus/theme-chalk/el-collapse-item.css';
+@use 'element-plus/theme-chalk/el-collapse-transition.css';
 
 .el-message {
   min-width: 300px;

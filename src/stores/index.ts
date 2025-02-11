@@ -21,7 +21,13 @@ export const useStore = defineStore('Store', {
     keys: keys,
     groups: groups,
     order: order ?? keys,
-    title: "Группы",
+    title: 'Группы',
+    desc: '',
+    currentGroup: <any>undefined,
+    currentID: <any>undefined,
+    backCb: <Function | undefined>undefined,
+    scroll: <number>0,
+    scrollRef: <any>undefined,
   }),
 
   actions: {
@@ -36,5 +42,24 @@ export const useStore = defineStore('Store', {
       await this.changeOrder();
       await idb.set(groupId, data);
     },
+
+    openGroup(id: string) {
+      this.currentGroup = this.groups[id];
+      this.currentID = id;
+      this.title = this.groups[id].meta.name;
+      this.desc = this.groups[id].meta.desc;
+      this.backCb = () => {
+        this.currentGroup = undefined;
+        this.currentID = undefined;
+        this.title = 'Группы';
+        this.desc = '';
+        this.backCb = undefined;
+      }
+    },
+
+    async syncGroup() {
+      const data = toRaw(this.groups[this.currentID]);
+      await idb.set(this.currentID, data);
+    }
   },
 })

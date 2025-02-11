@@ -7,4 +7,12 @@
   padding: 0;
   font-family: Arial, sans-serif;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  -webkit-text-size-adjust:none;
+  -ms-text-size-adjust:none;
+  -moz-text-size-adjust:none;
+  text-size-adjust:none;
 }
