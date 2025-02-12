@@ -25,10 +25,11 @@ export const useStore = defineStore('Store', {
     title: 'Группы',
     desc: '',
     currentGroup: <any>undefined,
-    currentID: <any>undefined,
+    currentID: <string | undefined>undefined,
     backCb: <Function | undefined>undefined,
     scroll: <number>0,
     scrollRef: <any>undefined,
+    newGroupRef: <any>undefined,
   }),
 
   actions: {
@@ -80,9 +81,11 @@ export const useStore = defineStore('Store', {
       }
     },
 
-    async syncGroup() {
-      const data = toRaw(this.groups[this.currentID]);
-      await idb.set(this.currentID, data);
+    async syncGroup(id?: string) {
+      if (!id) id = this.currentID!;
+
+      const data = toRaw(this.groups[id]);
+      await idb.set(id, data);
     }
   },
 })

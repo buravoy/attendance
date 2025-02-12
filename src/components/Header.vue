@@ -3,8 +3,16 @@ import {Back} from "@element-plus/icons-vue";
 import NewGroup from "./NewGroup.vue";
 import {useStore} from "../stores";
 import NewStudent from "./NewStudent.vue";
+import {nextTick, onMounted, ref} from "vue";
 
 const store = useStore();
+const newGroupRef = ref();
+
+onMounted(() => {
+  nextTick(() => {
+    store.newGroupRef = newGroupRef.value;
+  })
+})
 </script>
 
 <template>
@@ -17,7 +25,7 @@ const store = useStore();
       <p v-if="store.desc">{{store.desc}}</p>
     </div>
     <div class="control ms-auto">
-      <NewGroup v-if="!store.currentGroup"/>
+      <NewGroup ref="newGroupRef" v-show="!store.currentGroup"/>
       <NewStudent v-if="store.currentGroup"/>
     </div>
   </header>

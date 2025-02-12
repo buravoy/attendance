@@ -127,7 +127,7 @@ onMounted(() => {
           <div class="event">
             <div v-for="est in student?.attendance[makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day).toLocaleDateString()]"
                  class="est" :class="{red: est == 'Н'}"
-            >{{est}}</div>
+            ><b>{{est}}</b></div>
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@ onMounted(() => {
       <div v-if="eventDate">
         <div class="estimate-wrap">
           <div v-for="(est, key) in student?.attendance[eventDate.toLocaleDateString()]" class="estimate">
-            <div>{{ est }}</div>
+            <div><b>{{ est }}</b></div>
             <el-button @click="removeEvent(key)" :icon="Delete" text type="danger"/>
           </div>
         </div>
@@ -154,7 +154,7 @@ onMounted(() => {
           <el-radio-group v-model="currentEvent" class="d-flex align-items-center">
             <el-radio v-for="(est, k) in events" :value="est" size="large"
                       class="d-flex flex-column justify-content-center align-items-center"
-                      :class="!k ? 'me-4' : 'me-2'"
+                      :class="!k ? 'me-4 red' : 'me-2'"
             >{{est}}</el-radio>
           </el-radio-group>
         </div>
@@ -262,10 +262,19 @@ onMounted(() => {
 :deep(.el-radio) {
   border: 1px solid var(--el-color-info-light-3);
   border-radius: 4px;
-  padding: 0 5px;
+  padding: 3px 8px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
 
   &.is-checked {
     border-color: var(--el-color-primary);
+    background-color: var(--el-color-primary-light-5);
+
+    &.red {
+      border-color: var(--el-color-error);
+      background-color: var(--el-color-error-light-5);
+    }
   }
 }
 </style>

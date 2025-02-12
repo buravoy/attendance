@@ -3,7 +3,7 @@ import {Delete, Edit, MoreFilled} from "@element-plus/icons-vue";
 import {ElButton, ElDialog, ElDropdown, ElDropdownItem, ElDropdownMenu} from "element-plus";
 import {ref} from "vue";
 
-const emit = defineEmits(['open', 'remove']);
+const emit = defineEmits(['open', 'remove', 'edit']);
 
 defineProps({
   data: Object,
@@ -33,7 +33,7 @@ const deleteGroup = () => {
 
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item :icon="Edit">Редактировать</el-dropdown-item>
+          <el-dropdown-item @click="emit('edit')" :icon="Edit">Редактировать</el-dropdown-item>
           <el-dropdown-item @click="centerDialogVisible = true" :icon="Delete" divided style="color: var(--el-color-error)">Удалить группу</el-dropdown-item>
         </el-dropdown-menu>
       </template>
