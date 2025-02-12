@@ -50,11 +50,8 @@ const onOpen = () => {
 }
 
 const openForEdit = (id: string) => {
-  console.log(id)
-
   editId.value = id;
   const group = store.groups[id];
-
   groupName.value = group.meta.name;
   groupDescription.value = group.meta.decs;
   groupColor.value = group.meta.color;
@@ -114,7 +111,7 @@ defineExpose({
         </div>
       </template>
       <template #footer>
-        <div style="flex: auto">
+        <div class="text-center">
           <el-button v-if="!editId" type="primary" size="large" :disabled="groupName.length < 3" @click="addNew">Добавить</el-button>
           <el-button v-if="editId" type="primary" size="large" :disabled="groupName.length < 3" @click="saveOnEdit">Сохранить</el-button>
         </div>

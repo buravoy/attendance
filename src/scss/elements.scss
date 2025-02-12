@@ -18,6 +18,12 @@
 @use 'element-plus/theme-chalk/el-collapse-item.css';
 @use 'element-plus/theme-chalk/el-collapse-transition.css';
 
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
 .el-message {
   min-width: 300px;
 

@@ -106,6 +106,7 @@ const deleteGroup = () => {
 .group-info {
   padding: 5px;
   max-width: calc(100% - 50px);
+  width: calc(100% - 50px);
 }
 
 .title {
