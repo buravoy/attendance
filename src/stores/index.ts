@@ -46,22 +46,16 @@ export const useStore = defineStore('Store', {
 
 
     async deleteGroup(id: string) {
-
-
       const name = this.groups[id].meta?.name
-
-      console.log(name);
-      // return
 
       const io = this.order.findIndex((k: string) => k == id);
       if (io >= 0) this.order.splice(io, 1);
-      else return;
 
       const ik = this.keys.findIndex((k: string) => k == id);
       if (ik >= 0) this.keys.splice(ik, 1);
-      else return;
 
       delete this.groups[id];
+
       await idb.del(id);
       await this.changeOrder();
 

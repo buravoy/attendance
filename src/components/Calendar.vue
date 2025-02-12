@@ -2,7 +2,7 @@
 
 import {ElButton, ElDialog, ElRadio, ElRadioGroup, ElScrollbar} from "element-plus";
 import {CaretLeft, CaretRight, Delete} from "@element-plus/icons-vue";
-import {ref, shallowRef} from "vue";
+import {nextTick, onMounted, ref, shallowRef} from "vue";
 import {useStore} from "../stores";
 
 const props = defineProps({
@@ -11,6 +11,8 @@ const props = defineProps({
 
 const eventDate = ref<Date | undefined>();
 const isAddEvent = ref(false);
+const scrollRef = ref();
+const todayRef = ref();
 const currentDate = ref(new Date());
 const events = shallowRef(['Н', '1', '2', '3', '4', '5']);
 const currentEvent = shallowRef('Н')
@@ -80,6 +82,19 @@ const removeEvent = (key: number) => {
   props.student?.attendance[eventDate.value.toLocaleDateString()].splice(key, 1);
   store.syncGroup();
 }
+
+const goToToday = () => {
+  currentDate.value = new Date();
+  nextTick(() => {
+    todayRef.value[0]?.scrollIntoView({block: "center", inline:"center"})
+  })
+}
+
+onMounted(() => {
+  nextTick(() => {
+    todayRef.value[0]?.scrollIntoView({block: "center", inline:"center"})
+  })
+})
 </script>
 
 <template>
@@ -87,7 +102,7 @@ const removeEvent = (key: number) => {
     <div class="ym-control">
       <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth"/>
 
-      <div class="y-m" @dblclick="currentDate = new Date()">
+      <div class="y-m" @dblclick="goToToday">
         <div class="month">{{currentDate.toLocaleString('default', { month: 'long' })}}</div>
         <div class="year ms-2">{{currentDate.getFullYear()}}</div>
       </div>
@@ -96,11 +111,12 @@ const removeEvent = (key: number) => {
       <el-button :icon="CaretRight" size="small" circle plain type="info" @click="nextMonth"/>
     </div>
 
-    <el-scrollbar>
+    <el-scrollbar ref="scrollRef">
       <div  class="days">
         <div v-for="day in daysInMonth(currentDate.getMonth() + 1, currentDate.getFullYear())"
              class="day"
              :class="{today: isToday(day)}"
+             :ref="isToday(day) ? 'todayRef' : undefined"
              @click="isToday(day) ? openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day)) : false"
              @dblclick="openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
         >
@@ -125,7 +141,7 @@ const removeEvent = (key: number) => {
     })" destroy-on-close center :close-on-click-modal="false" :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
     >
       <div v-if="eventDate">
-        <div>
+        <div class="estimate-wrap">
           <div v-for="(est, key) in student?.attendance[eventDate.toLocaleDateString()]" class="estimate">
             <div>{{ est }}</div>
             <el-button @click="removeEvent(key)" :icon="Delete" text type="danger"/>
@@ -138,7 +154,7 @@ const removeEvent = (key: number) => {
           <el-radio-group v-model="currentEvent" class="d-flex align-items-center">
             <el-radio v-for="(est, k) in events" :value="est" size="large"
                       class="d-flex flex-column justify-content-center align-items-center"
-                      :class="!k ? 'me-5' : 'me-3'"
+                      :class="!k ? 'me-4' : 'me-2'"
             >{{est}}</el-radio>
           </el-radio-group>
         </div>
@@ -155,11 +171,23 @@ const removeEvent = (key: number) => {
 </template>
 
 <style scoped lang="scss">
+.estimate-wrap {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
 .estimate {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 50px;
+  padding: 0 0 0 35px;
+
+  &:nth-child(odd) {
+    background-color: var(--el-color-info-light-7);
+  }
+  &:nth-child(even) {
+    background-color: var(--el-color-info-light-9);
+  }
 }
 
 .event {
@@ -229,5 +257,15 @@ const removeEvent = (key: number) => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+:deep(.el-radio) {
+  border: 1px solid var(--el-color-info-light-3);
+  border-radius: 4px;
+  padding: 0 5px;
+
+  &.is-checked {
+    border-color: var(--el-color-primary);
+  }
 }
 </style>
