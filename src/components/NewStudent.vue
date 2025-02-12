@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, shallowRef} from "vue";
-import {ElButton, ElDialog, ElDrawer, ElInput, ElMessage, ElScrollbar} from "element-plus";
+import {ElButton, ElCheckbox, ElDialog, ElDrawer, ElInput, ElMessage, ElOption, ElScrollbar, ElSelect} from "element-plus";
 import {useStore} from "../stores";
 import {Plus} from "@element-plus/icons-vue";
 
@@ -8,7 +8,13 @@ const store = useStore();
 const inputRef = ref();
 const isShow = shallowRef(false);
 const dialogVisible = ref(false);
+const fileStr = ref<string | null >();
 const fileArray = ref<string[][]>();
+const csvDelimiter = ref<string>(';');
+const ignoreFirstLine = shallowRef(true);
+
+const cellOptions = shallowRef(['---', 'ФИО', 'Фамилия', 'Имя', 'Отчество']);
+const cellOptVal = ref<string[]>([]);
 
 const studentName = shallowRef('');
 const studentSurname = shallowRef('');
@@ -45,6 +51,7 @@ const openImport = () => {
   isShow.value = false;
   dialogVisible.value = true;
   fileArray.value = [];
+  fileStr.value = '';
 }
 
 const openFileInBrowser = (accept: string | null): Promise<string | null > => new Promise((resolve) => {
@@ -67,7 +74,7 @@ const openFileInBrowser = (accept: string | null): Promise<string | null > => ne
 })
 
 
-function CSVToArray( strData: string, strDelimiter: string ){
+const CSVToArray = ( strData: string, strDelimiter: string ) => {
   strDelimiter = (strDelimiter || ",");
   const objPattern = new RegExp(("(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
       "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
@@ -91,10 +98,17 @@ function CSVToArray( strData: string, strDelimiter: string ){
   return(arrData);
 }
 
-const openFile = async () => {
-  const file: string | null = await openFileInBrowser('.csv');
+const convertToArray = () => {
+  if (!fileStr.value) return;
+  fileArray.value = CSVToArray(fileStr.value, csvDelimiter.value);
+  cellOptVal.value = fileArray.value[0].map((_, i) => i == 0 ? 'ФИО' : '---');
+}
 
-  if (!file) {
+const openFile = async () => {
+  fileStr.value = await openFileInBrowser('.csv');
+
+  if (!fileStr.value) {
+    fileStr.value = '';
     return ElMessage({
       message: `Файл не поддерживается`,
       type: 'error',
@@ -102,9 +116,23 @@ const openFile = async () => {
     });
   }
 
-  fileArray.value = CSVToArray(file, ';');
+  convertToArray()
 }
 
+
+const changeOpt = (key, val) => {
+  if (val == 'ФИО') {
+    cellOptVal.value.forEach((_, i) => {
+      cellOptVal.value[i] = '---';
+    })
+  }
+
+
+
+  cellOptVal.value[key] = val;
+
+  console.log(key, val)
+}
 </script>
 
 <template>
@@ -152,8 +180,18 @@ const openFile = async () => {
   <el-dialog v-model="dialogVisible" title="Импорт">
     <p class="my-3 text-center">Импорт списка студентов из *.csv файла</p>
 
+
     <el-scrollbar v-if="fileArray?.length" class="table-preview">
       <table>
+        <thead>
+        <tr>
+          <th v-for="(_, optKey) in fileArray[0]">
+            <el-select v-model="cellOptVal[optKey]" style="width: 120px;" size="small" @change="(val) => changeOpt(optKey, val)" >
+              <el-option v-for="opt in cellOptions" :key="opt" :label="opt" :value="opt" />
+            </el-select>
+          </th>
+        </tr>
+        </thead>
         <tbody>
           <tr v-for="row in fileArray">
             <th v-for="cell in row">{{ cell }}</th>
@@ -161,6 +199,21 @@ const openFile = async () => {
         </tbody>
       </table>
     </el-scrollbar>
+
+    <div v-if="fileStr" class="d-flex align-items-center justify-content-center mt-3 mb-2">
+      <p class="me-4">Разделитель: </p>
+
+      <el-input v-model="csvDelimiter" style="width: 70px;" class="me-3"/>
+
+      <el-select v-model="csvDelimiter" style="width: 120px;" @change="convertToArray">
+        <el-option v-for="item in [{v: ',', d: ', (зпт.)'}, {v:';', d: '; (тчк.зпт.)'}]" :key="item.v" :label="item.d" :value="item.v" />
+      </el-select>
+    </div>
+
+    <div class="text-center mb-5">
+      <el-checkbox v-if="fileStr" v-model="ignoreFirstLine" label="Игнорировать первую строку" size="large" />
+    </div>
+
 
 
 
@@ -171,10 +224,8 @@ const openFile = async () => {
 
     <template #footer>
       <div class="dialog-footer mt-5 text-center">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
-          Confirm
-        </el-button>
+        <el-button @click="dialogVisible = false">Отмена</el-button>
+        <el-button type="primary" @click="dialogVisible = false">Импортировать</el-button>
       </div>
     </template>
   </el-dialog>
@@ -187,6 +238,21 @@ const openFile = async () => {
 
   table {
     min-width: 100%;
+    border-collapse: collapse;
+    tbody {
+      th {
+        padding: 1px 2px;
+      }
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background-color: var(--el-color-primary-light-8);
+      border-radius: 4px;
+      overflow: hidden;
+    }
   }
 }
 
