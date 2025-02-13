@@ -2,11 +2,12 @@
 
 import {ElButton, ElDialog, ElRadio, ElRadioGroup, ElScrollbar} from "element-plus";
 import {CaretLeft, CaretRight, Delete} from "@element-plus/icons-vue";
-import {nextTick, onMounted, ref, shallowRef} from "vue";
+import {nextTick, ref, shallowRef, watch} from "vue";
 import {useStore} from "../stores";
 
 const props = defineProps({
   student: Object,
+  renderKey: Number
 })
 
 const eventDate = ref<Date | undefined>();
@@ -85,15 +86,24 @@ const removeEvent = (key: number) => {
 
 const goToToday = () => {
   currentDate.value = new Date();
+
+
+
   nextTick(() => {
-    todayRef.value[0]?.scrollIntoView({block: "center", inline:"center"})
+    scrollRef.value.scrollTo({
+      left: todayRef.value[0]?.offsetLeft - (todayRef.value[0].parentNode.clientWidth / 2) + (todayRef.value[0]?.clientWidth / 2)
+    });
   })
 }
 
-onMounted(() => {
-  nextTick(() => {
-    todayRef.value[0]?.scrollIntoView({block: "center", inline:"center"})
-  })
+watch(() => props.renderKey, () => {
+  if (props.renderKey == 1) {
+    nextTick(() => {
+      scrollRef.value.scrollTo({
+        left: todayRef.value[0]?.offsetLeft - (todayRef.value[0].parentNode.clientWidth / 2) + (todayRef.value[0]?.clientWidth / 2)
+      });
+    })
+  }
 })
 </script>
 
@@ -101,13 +111,10 @@ onMounted(() => {
   <div class="calendar">
     <div class="ym-control">
       <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth"/>
-
       <div class="y-m" @dblclick="goToToday">
         <div class="month">{{currentDate.toLocaleString('default', { month: 'long' })}}</div>
         <div class="year ms-2">{{currentDate.getFullYear()}}</div>
       </div>
-
-
       <el-button :icon="CaretRight" size="small" circle plain type="info" @click="nextMonth"/>
     </div>
 
@@ -115,10 +122,10 @@ onMounted(() => {
       <div  class="days">
         <div v-for="day in daysInMonth(currentDate.getMonth() + 1, currentDate.getFullYear())"
              class="day"
-             :class="{today: isToday(day)}"
+             :class="{today: isToday(day), weekend: ['сб', 'вс'].includes(dayName(currentDate.getMonth() + 1, currentDate.getFullYear(), day))}"
              :ref="isToday(day) ? 'todayRef' : undefined"
-             @click="isToday(day) ? openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day)) : false"
-             @dblclick="openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
+             @click.stop="isToday(day) ? openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day)) : false"
+             @dblclick.stop="openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
         >
           <div class="day-name">
             {{day}} <span>{{dayName(currentDate.getMonth() + 1, currentDate.getFullYear(), day)}}</span>
@@ -195,6 +202,7 @@ onMounted(() => {
   align-items: center;
   flex-direction: column;
   min-height: 10px;
+  position: relative;
   .est {
     width: 100%;
     text-align: center;
@@ -213,6 +221,7 @@ onMounted(() => {
   white-space: nowrap;
   font-weight: 600;
   padding: 0 5px;
+  position: relative;
   span {
     opacity: 0.7;
     font-weight: 500;
@@ -240,6 +249,21 @@ onMounted(() => {
 .day {
   &:not(:last-child) {
     border-right: 1px solid var(--el-color-info-light-3);
+  }
+
+  &.weekend {
+    position: relative;
+    &:before {
+      //z-index: 1;
+      position: absolute;
+      content: '';
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      background-color: var(--el-color-warning-light-8);
+    }
+
   }
 
   &.today {

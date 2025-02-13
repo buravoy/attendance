@@ -13,6 +13,7 @@
 @use 'element-plus/theme-chalk/el-dialog.css';
 @use 'element-plus/theme-chalk/el-overlay.css';
 @use 'element-plus/theme-chalk/el-popper.css';
+@use 'element-plus/theme-chalk/el-popconfirm.css';
 @use 'element-plus/theme-chalk/el-scrollbar.css';
 @use 'element-plus/theme-chalk/el-collapse.css';
 @use 'element-plus/theme-chalk/el-collapse-item.css';
@@ -20,6 +21,10 @@
 @use 'element-plus/theme-chalk/el-option.css';
 @use 'element-plus/theme-chalk/el-select.css';
 @use 'element-plus/theme-chalk/el-checkbox.css';
+
+.el-collapse-transition-enter-active {
+  //transition-delay: 1s;
+}
 
 .dialog-footer {
   display: flex;
@@ -50,4 +55,5 @@
 
 .el-dialog {
   min-width: 300px;
+  --el-dialog-width: 90%;
 }

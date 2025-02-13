@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, shallowRef} from "vue";
+import {computed, ref, shallowRef} from "vue";
 import {ElButton, ElCheckbox, ElDialog, ElDrawer, ElInput, ElMessage, ElOption, ElScrollbar, ElSelect} from "element-plus";
 import {useStore} from "../stores";
 import {Plus} from "@element-plus/icons-vue";
@@ -12,10 +12,9 @@ const fileStr = ref<string | null >();
 const fileArray = ref<string[][]>();
 const csvDelimiter = ref<string>(';');
 const ignoreFirstLine = shallowRef(true);
-
+const chunkFIO = shallowRef(true);
 const cellOptions = shallowRef(['---', 'ФИО', 'Фамилия', 'Имя', 'Отчество']);
 const cellOptVal = ref<string[]>([]);
-
 const studentName = shallowRef('');
 const studentSurname = shallowRef('');
 const studentPatroname = shallowRef('');
@@ -73,7 +72,6 @@ const openFileInBrowser = (accept: string | null): Promise<string | null > => ne
   link.click();
 })
 
-
 const CSVToArray = ( strData: string, strDelimiter: string ) => {
   strDelimiter = (strDelimiter || ",");
   const objPattern = new RegExp(("(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
@@ -119,20 +117,94 @@ const openFile = async () => {
   convertToArray()
 }
 
-
-const changeOpt = (key, val) => {
+const changeOpt = (key: number, val: string) => {
   if (val == 'ФИО') {
     cellOptVal.value.forEach((_, i) => {
       cellOptVal.value[i] = '---';
     })
   }
 
+  if (val == 'Фамилия') {
+    cellOptVal.value.forEach((_, i) => {
+      if (cellOptVal.value[i] == 'Фамилия' || cellOptVal.value[i] == 'ФИО') cellOptVal.value[i] = '---';
+    })
+  }
 
+  if (val == 'Имя') {
+    cellOptVal.value.forEach((_, i) => {
+      if (cellOptVal.value[i] == 'Имя' || cellOptVal.value[i] == 'ФИО')cellOptVal.value[i] = '---';
+    })
+  }
+
+  if (val == 'Отчество') {
+    cellOptVal.value.forEach((_, i) => {
+      if (cellOptVal.value[i] == 'Отчество' || cellOptVal.value[i] == 'ФИО')cellOptVal.value[i] = '---';
+    })
+  }
 
   cellOptVal.value[key] = val;
-
-  console.log(key, val)
 }
+
+const addStudentsFromCSV = async () => {
+  if (!fileArray?.value?.length) return;
+  let count = 0;
+
+  const indexFIO = cellOptVal.value.findIndex(i => i == 'ФИО');
+  const indexSurname = cellOptVal.value.findIndex(i => i == 'Фамилия');
+  const indexName = cellOptVal.value.findIndex(i => i == 'Имя');
+  const indexPatroname = cellOptVal.value.findIndex(i => i == 'Отчество');
+
+  console.log(cellOptVal.value, indexFIO, indexSurname, indexName, indexPatroname)
+
+  for (let i = 0; i < fileArray.value.length; i++) {
+    if (ignoreFirstLine.value && i == 0) continue;
+
+    const row = fileArray.value[i];
+    let student: any = {
+      name: '',
+      patroname: '',
+      attendance: {}
+    };
+
+    if (indexFIO >= 0) {
+      if (chunkFIO.value) {
+        if (!row[indexFIO]) continue;
+
+        const fio: string[] = row[indexFIO].split(' ');
+        student.surname = fio[0] || '';
+        student.name = fio[1] || '';
+        student.patroname = fio[2] || '';
+      } else {
+        student.surname = row[indexFIO] || '';
+      }
+    } else {
+      student.surname = row[indexSurname] || '';
+      student.name = row[indexName] || '';
+      student.patroname = row[indexPatroname] || '';
+    }
+
+    console.log(student);
+    if (!student.surname) continue;
+
+    store.currentGroup.students.push(student);
+    count++
+  }
+
+  await store.syncGroup()
+
+  ElMessage({
+    message: `Добавлено ${count} студентов`,
+    type: 'success',
+    showClose: true,
+  });
+
+  dialogVisible.value = false;
+}
+
+const isImportAvailable = computed(() => {
+  if (!fileArray?.value?.length) return false
+  return true;
+})
 </script>
 
 <template>
@@ -177,10 +249,7 @@ const changeOpt = (key, val) => {
     </template>
   </el-drawer>
 
-  <el-dialog v-model="dialogVisible" title="Импорт">
-    <p class="my-3 text-center">Импорт списка студентов из *.csv файла</p>
-
-
+  <el-dialog v-model="dialogVisible" title="Импорт из *.csv">
     <el-scrollbar v-if="fileArray?.length" class="table-preview">
       <table>
         <thead>
@@ -210,22 +279,20 @@ const changeOpt = (key, val) => {
       </el-select>
     </div>
 
-    <div class="text-center mb-5">
-      <el-checkbox v-if="fileStr" v-model="ignoreFirstLine" label="Игнорировать первую строку" size="large" />
+    <div class="d-flex flex-column align-items-center mb-5">
+      <el-checkbox v-if="fileStr" v-model="ignoreFirstLine" label="Игнорировать первую строку" size="large" class="me-0" />
+      <el-checkbox v-if="fileStr" v-model="chunkFIO" label="Разбить ФИО по пробелам" size="large" />
     </div>
 
-
-
-
     <div class="text-center">
-      <el-button type="primary" size="large" @click="openFile">Выбрать файл</el-button>
+      <el-button type="primary" size="large" @click="openFile">Выбрать {{fileStr ? 'другой' : ''}} файл</el-button>
     </div>
 
 
     <template #footer>
       <div class="dialog-footer mt-5 text-center">
         <el-button @click="dialogVisible = false">Отмена</el-button>
-        <el-button type="primary" @click="dialogVisible = false">Импортировать</el-button>
+        <el-button type="primary" @click="addStudentsFromCSV" :disabled="!isImportAvailable">Импортировать</el-button>
       </div>
     </template>
   </el-dialog>
@@ -235,6 +302,7 @@ const changeOpt = (key, val) => {
 <style scoped lang="scss">
 .table-preview {
   height: 200px;
+  padding-bottom: 15px;
 
   table {
     min-width: 100%;
@@ -249,9 +317,8 @@ const changeOpt = (key, val) => {
       position: sticky;
       top: 0;
       z-index: 1;
-      background-color: var(--el-color-primary-light-8);
-      border-radius: 4px;
-      overflow: hidden;
+      background-color: var(--el-dialog-bg-color);
+      padding: 0 2px;
     }
   }
 }
