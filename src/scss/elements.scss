@@ -23,6 +23,10 @@
 @use 'element-plus/theme-chalk/el-checkbox.css';
 @use 'element-plus/theme-chalk/el-switch.css';
 
+.el-popconfirm__main {
+  word-break: break-word;
+}
+
 .el-collapse-transition-enter-active {
   //transition-delay: 1s;
 }
