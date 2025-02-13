@@ -69,6 +69,8 @@ watch(() => store.currentGroup?.students, () => {
 
 onMounted(() => {
   renderKeys.value = store.currentGroup?.students.map(() => 0);
+
+  store.backHandler(store.backCb!);
 })
 </script>
 

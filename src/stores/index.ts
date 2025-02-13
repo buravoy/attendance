@@ -30,9 +30,33 @@ export const useStore = defineStore('Store', {
     scroll: <number>0,
     scrollRef: <any>undefined,
     newGroupRef: <any>undefined,
+    dark: false,
   }),
 
   actions: {
+    popStateCb: () => {},
+    popStateCbPrev: () => {},
+
+    popStateHandler() {
+      this.popStateCb();
+      this.popStateCb = this.popStateCbPrev;
+    },
+
+    backHandler(handler: any) {
+      this.popStateCbPrev = this.popStateCb;
+      this.popStateCb = handler;
+      const hash = Date.now().toString(32);
+      window.history.pushState(hash, '', document.location.href.split('#')[0])
+      window.history.pushState(hash, '', document.location.href + '#' + hash);
+    },
+
+    async fullSync() {
+      const keys: string[] = await idb.keys();
+      for (const i of keys) {
+        await idb.del(i);
+      }
+    },
+
     async changeOrder() {
       await idb.set('_order', toRaw(this.order));
     },
@@ -67,18 +91,20 @@ export const useStore = defineStore('Store', {
       });
     },
 
+    backGroups() {
+      this.currentGroup = undefined;
+      this.currentID = undefined;
+      this.title = 'Группы';
+      this.desc = '';
+      this.backCb = undefined;
+    },
+
     openGroup(id: string) {
       this.currentGroup = this.groups[id];
       this.currentID = id;
       this.title = this.groups[id].meta.name;
       this.desc = this.groups[id].meta.desc;
-      this.backCb = () => {
-        this.currentGroup = undefined;
-        this.currentID = undefined;
-        this.title = 'Группы';
-        this.desc = '';
-        this.backCb = undefined;
-      }
+      this.backCb = () => this.backGroups();
     },
 
     async syncGroup(id?: string) {

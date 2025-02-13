@@ -47,6 +47,10 @@ const onClose = () => {
 
 const onOpen = () => {
   setTimeout(inputRef.value?.focus, 200);
+
+  store.backHandler(() => {
+    isShow.value = false;
+  })
 }
 
 const openForEdit = (id: string) => {
@@ -59,8 +63,6 @@ const openForEdit = (id: string) => {
 }
 
 const saveOnEdit = () => {
-
-
   Object.assign(store.groups[editId.value!].meta, {
     name: groupName.value,
     desc: groupDescription.value,
@@ -83,7 +85,7 @@ defineExpose({
 
 <template>
   <div>
-    <el-button type="primary" size="large" :icon="Plus" @click="isShow = true" plain circle />
+    <el-button size="large" class="" :icon="Plus" @click="isShow = true" plain circle />
 
     <el-drawer v-model="isShow" size="100%" @opened="onOpen" @closed="onClose">
       <template #header>

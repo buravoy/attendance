@@ -18,7 +18,7 @@ onMounted(() => {
 
 <template>
   <header :style="{backgroundColor: store.currentGroup?.meta.color}">
-    <div v-if="store.backCb" class="back" @click="store.backCb()">
+    <div v-if="store.backCb" class="back header-btn" @click="store.backCb()">
       <Back class="icon"/>
     </div>
     <div class="title" :class="{'ms-3': !store.backCb}">
@@ -26,14 +26,38 @@ onMounted(() => {
       <p v-if="store.desc">{{store.desc}}</p>
     </div>
     <div class="control ms-auto">
-      <NewGroup ref="newGroupRef" v-show="!store.currentGroup"/>
-      <NewStudent v-if="store.currentGroup"/>
-      <Menu />
+      <NewGroup ref="newGroupRef" v-show="!store.currentGroup" class="header-btn"/>
+      <NewStudent v-if="store.currentGroup" class="header-btn"/>
+      <Menu class="header-btn"/>
     </div>
   </header>
 </template>
 
 <style scoped lang="scss">
+.header-btn {
+  min-width: var(--at-header-height);
+  height: var(--at-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :deep(.el-button) {
+    border: none;
+    position: relative;
+    overflow: hidden;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--el-mask-color-extra-light);
+    }
+  }
+}
+
 .icon {
   width: 20px;
   height: 20px;
@@ -53,8 +77,6 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--at-header-height);
-  min-width: var(--at-header-height);
 }
 
 .title {
@@ -62,7 +84,7 @@ header {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  width: calc(100vw - var(--at-header-height) - var(--at-header-height));
+  width: calc(100vw - var(--at-header-height) - var(--at-header-height) - var(--at-header-height));
 
   h4 {
     white-space: nowrap;

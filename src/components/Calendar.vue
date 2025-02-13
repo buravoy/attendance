@@ -96,6 +96,12 @@ const goToToday = () => {
   })
 }
 
+const onOpen = () => {
+  store.backHandler(() => {
+    isAddEvent.value = false;
+  })
+}
+
 watch(() => props.renderKey, () => {
   if (props.renderKey == 1) {
     nextTick(() => {
@@ -145,7 +151,10 @@ watch(() => props.renderKey, () => {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
-    })" destroy-on-close center :close-on-click-modal="false" :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
+    })"
+               destroy-on-close center
+               :close-on-click-modal="false" :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
+               @opened="onOpen"
     >
       <div v-if="eventDate">
         <div class="estimate-wrap">
