@@ -4,6 +4,7 @@ import NewGroup from "./NewGroup.vue";
 import {useStore} from "../stores";
 import NewStudent from "./NewStudent.vue";
 import {nextTick, onMounted, ref} from "vue";
+import Menu from "./Menu.vue";
 
 const store = useStore();
 const newGroupRef = ref();
@@ -27,6 +28,7 @@ onMounted(() => {
     <div class="control ms-auto">
       <NewGroup ref="newGroupRef" v-show="!store.currentGroup"/>
       <NewStudent v-if="store.currentGroup"/>
+      <Menu />
     </div>
   </header>
 </template>
