@@ -254,7 +254,6 @@ watch(() => props.renderKey, () => {
   &.weekend {
     position: relative;
     &:before {
-      //z-index: 1;
       position: absolute;
       content: '';
       top: 0;
@@ -268,6 +267,9 @@ watch(() => props.renderKey, () => {
 
   &.today {
     background-color: var(--el-color-primary-light-8);
+    &:before {
+      content: unset;
+    }
   }
 }
 
