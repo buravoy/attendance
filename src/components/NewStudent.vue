@@ -154,8 +154,6 @@ const addStudentsFromCSV = async () => {
   const indexName = cellOptVal.value.findIndex(i => i == 'Имя');
   const indexPatroname = cellOptVal.value.findIndex(i => i == 'Отчество');
 
-  console.log(cellOptVal.value, indexFIO, indexSurname, indexName, indexPatroname)
-
   for (let i = 0; i < fileArray.value.length; i++) {
     if (ignoreFirstLine.value && i == 0) continue;
 
@@ -203,6 +201,7 @@ const addStudentsFromCSV = async () => {
 
 const isImportAvailable = computed(() => {
   if (!fileArray?.value?.length) return false
+  if (!cellOptVal.value.includes('Фамилия') && !cellOptVal.value.includes('ФИО')) return false
   return true;
 })
 </script>

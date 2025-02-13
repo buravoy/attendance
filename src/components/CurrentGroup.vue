@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useStore} from "../stores";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {type CollapseModelValue, ElButton, ElCollapse, ElCollapseItem, ElMessage, ElPopconfirm} from "element-plus";
 import Calendar from "./Calendar.vue";
 import {Delete} from "@element-plus/icons-vue";
@@ -38,33 +38,34 @@ const initCalendar = (id: CollapseModelValue) => {
 }
 
 const studentAttendance = (attendance: any) => {
-  let html = '';
+  let html = [];
   let count = 0;
 
   const sortedAttendance = Object.keys(attendance).sort((a: string, b: string) => {
     const _a = a.split('.');
-    const _b = a.split('.');
-
-    return new Date().getTime() - new Date(a).getTime()
+    const _b = b.split('.');
+    return new Date(+_a[2], +_a[1] - 1, +_a[0]).getTime() - new Date(+_b[2], +_b[1] - 1, +_b[0]).getTime()
   });
 
-  console.log(sortedAttendance)
-
-  for (const date in attendance) {
+  for (const date of sortedAttendance) {
     for (const i in attendance[date]) {
-      html += `<span class="${attendance[date][i] == 'Н' ? 'red' : ''}">${attendance[date][i]}</span>`;
+      html.push(`<span class="att-prev ${attendance[date][i] == 'Н' ? 'red' : ''}">${attendance[date][i]}</span>`);
       count++
       if (count >= 5) break;
     }
     if (count >= 5) break;
   }
-  return html
+  return html.join('')
 }
 
 const removeStudent = (key: number) => {
   store.currentGroup?.students.splice(key, 1);
   store.syncGroup();
 }
+
+watch(() => store.currentGroup?.students, () => {
+  renderKeys.value = store.currentGroup?.students.map((_: never, i: number) => (renderKeys.value[i] > 0) ? renderKeys.value[i] : 0);
+}, { deep: true })
 
 onMounted(() => {
   renderKeys.value = store.currentGroup?.students.map(() => 0);
@@ -110,6 +111,29 @@ onMounted(() => {
       border-bottom: none;
       text-transform: capitalize;
       width: 100%;
+
+      & span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 1px;
+      }
+
+      .att-prev {
+        background-color: var(--el-color-info-light-3);
+        height: 18px;
+        min-width: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 3px;
+        padding: 1px 4px;
+        border-radius: 4px;
+        line-height: 0;
+        &.red {
+          background-color: var(--el-color-error);
+        }
+      }
 
       .el-collapse-item__arrow {
         margin: 0;
