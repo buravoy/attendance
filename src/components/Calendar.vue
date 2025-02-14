@@ -7,13 +7,13 @@ import {useStore} from "../stores";
 
 const props = defineProps({
   student: Object,
-  renderKey: Number
+  renderKey: Number,
+  id: Number
 })
 
 const eventDate = ref<Date | undefined>();
 const isAddEvent = ref(false);
 const scrollRef = ref();
-const todayRef = ref();
 const currentDate = ref(new Date());
 const events = shallowRef(['Н', '1', '2', '3', '4', '5']);
 const currentEvent = shallowRef('Н')
@@ -53,7 +53,12 @@ const prevMonth = () => {
 }
 
 const isToday = (day: number) => {
-  return new Date().toLocaleDateString() == makeDate(currentDate.value.getMonth() + 1, currentDate.value.getFullYear(), day).toLocaleDateString()
+  const today = new Date().toLocaleDateString() == makeDate(currentDate.value.getMonth() + 1, currentDate.value.getFullYear(), day).toLocaleDateString();
+
+  // console.log(today)
+
+  // return new Date().toLocaleDateString() == makeDate(currentDate.value.getMonth() + 1, currentDate.value.getFullYear(), day).toLocaleDateString()
+  return today
 }
 
 const openEvents = (date: Date) => {
@@ -87,13 +92,20 @@ const removeEvent = (key: number) => {
 const goToToday = () => {
   currentDate.value = new Date();
 
-
-
   nextTick(() => {
+    const today: HTMLElement | null = document.getElementById('todayRef' + props.id)
+    const {parentNode} = today as any;
+
+    if (!today || !parentNode) return;
+
     scrollRef.value.scrollTo({
-      left: todayRef.value[0]?.offsetLeft - (todayRef.value[0].parentNode.clientWidth / 2) + (todayRef.value[0]?.clientWidth / 2)
+      left: today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2)
     });
   })
+}
+
+const onClose = () => {
+  store.backHandler(store.backCb!);
 }
 
 const onOpen = () => {
@@ -105,8 +117,13 @@ const onOpen = () => {
 watch(() => props.renderKey, () => {
   if (props.renderKey == 1) {
     nextTick(() => {
+      const today: HTMLElement | null = document.getElementById('todayRef' + props.id)
+      const {parentNode} = today as any;
+
+      if (!today || !parentNode) return;
+
       scrollRef.value.scrollTo({
-        left: todayRef.value[0]?.offsetLeft - (todayRef.value[0].parentNode.clientWidth / 2) + (todayRef.value[0]?.clientWidth / 2)
+        left: today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2)
       });
     })
   }
@@ -117,7 +134,7 @@ watch(() => props.renderKey, () => {
   <div class="calendar">
     <div class="ym-control">
       <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth"/>
-      <div class="y-m" @dblclick="goToToday">
+      <div class="y-m" @contextmenu.prevent="goToToday">
         <div class="month">{{currentDate.toLocaleString('default', { month: 'long' })}}</div>
         <div class="year ms-2">{{currentDate.getFullYear()}}</div>
       </div>
@@ -128,10 +145,9 @@ watch(() => props.renderKey, () => {
       <div  class="days">
         <div v-for="day in daysInMonth(currentDate.getMonth() + 1, currentDate.getFullYear())"
              class="day"
+             :id="isToday(day) ? 'todayRef' + id : undefined"
              :class="{today: isToday(day), weekend: ['сб', 'вс'].includes(dayName(currentDate.getMonth() + 1, currentDate.getFullYear(), day))}"
-             :ref="isToday(day) ? 'todayRef' : undefined"
-             @click.stop="isToday(day) ? openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day)) : false"
-             @dblclick.stop="openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
+             @contextmenu.prevent="openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
         >
           <div class="day-name">
             {{day}} <span>{{dayName(currentDate.getMonth() + 1, currentDate.getFullYear(), day)}}</span>
@@ -155,6 +171,7 @@ watch(() => props.renderKey, () => {
                destroy-on-close center
                :close-on-click-modal="false" :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
                @opened="onOpen"
+               @closed="onClose"
     >
       <div v-if="eventDate">
         <div class="estimate-wrap">
@@ -248,6 +265,7 @@ watch(() => props.renderKey, () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 }
 
 .days {
@@ -256,6 +274,8 @@ watch(() => props.renderKey, () => {
 }
 
 .day {
+  user-select: none;
+
   &:not(:last-child) {
     border-right: 1px solid var(--el-color-info-light-3);
   }

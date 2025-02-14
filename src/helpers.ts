@@ -1,4 +1,6 @@
-export const helpers = (accept: string | null): Promise<string | null > => new Promise((resolve) => {
+import {Buffer} from "buffer";
+
+export const openFileInBrowser = (accept: string | null): Promise<string | null > => new Promise((resolve) => {
   const link = document.createElement("input");
   link.type = 'file';
   link.accept = accept ?? '*.*';
@@ -27,4 +29,14 @@ export const merge = (a: any, b: any, predicate = (a: any, b: any) => a === b) =
 export const getColorByBgColor = (bgColor: string) => {
   if (!bgColor) { return ''; }
   return (parseInt(bgColor.replace('#', ''), 16) > 0xffffff / 2) ? '#000' : '#fff';
+}
+
+export function jsonToBase64(object: any) {
+  const json = JSON.stringify(object);
+  return Buffer.from(json).toString("base64");
+}
+
+export function base64ToJson(base64String: string) {
+  const json = Buffer.from(base64String, "base64").toString();
+  return JSON.parse(json);
 }

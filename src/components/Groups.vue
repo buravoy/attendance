@@ -2,14 +2,19 @@
 import {useStore} from "../stores";
 import {VueDraggableNext as Draggable} from 'vue-draggable-next'
 import GroupItem from "./GroupItem.vue";
-import {nextTick, onMounted} from "vue";
+import {nextTick, onMounted, onUnmounted} from "vue";
 
 const store = useStore();
 
 onMounted(() => {
+  store.isStart = true;
   nextTick(() => {
     store.scrollRef?.scrollTo({top: store.scroll});
   })
+})
+
+onUnmounted(() => {
+  store.isStart = false;
 })
 </script>
 

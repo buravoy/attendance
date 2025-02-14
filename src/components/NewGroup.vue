@@ -37,6 +37,8 @@ const addNew = async () => {
 }
 
 const onClose = () => {
+  store.isStart = true;
+
   if (editId.value) {
     groupName.value = '';
     groupDescription.value = '';
@@ -49,6 +51,8 @@ const onClose = () => {
 
 const onOpen = () => {
   setTimeout(inputRef.value?.focus, 200);
+
+  store.isStart = false;
 
   store.backHandler(() => {
     isShow.value = false;
@@ -100,7 +104,7 @@ defineExpose({
         <div class="item mb-5">
           <label>Наименование</label>
           <div class="d-flex align-items-center justify-content-start">
-            <el-input ref="inputRef" v-model="groupName" class="me-2" placeholder="Новая группа" size="large"/>
+            <el-input ref="inputRef" v-model="groupName" class="me-2" placeholder="Новая группа" size="large" @input="val => groupName = val"/>
             <el-color-picker v-model="groupColor"
                              size="large"
                              @activeChange="(val) => groupColor = val!"
@@ -112,7 +116,7 @@ defineExpose({
         <div class="item">
           <label>Примечание</label>
           <div class="d-flex align-items-center justify-content-start">
-            <el-input v-model="groupDescription" type="textarea" :autosize="{minRows: 3, maxRows: 5}" size="large"/>
+            <el-input v-model="groupDescription" type="textarea" :autosize="{minRows: 3, maxRows: 5}" size="large" @input="val => groupDescription = val"/>
           </div>
         </div>
       </template>

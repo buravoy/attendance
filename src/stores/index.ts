@@ -31,6 +31,7 @@ export const useStore = defineStore('Store', {
     scrollRef: <any>undefined,
     newGroupRef: <any>undefined,
     dark: false,
+    isStart: false,
   }),
 
   actions: {
@@ -45,17 +46,9 @@ export const useStore = defineStore('Store', {
     backHandler(handler: any) {
       this.popStateCbPrev = this.popStateCb;
       this.popStateCb = handler;
-      const hash = Date.now().toString(32);
-      window.history.pushState(hash, '', document.location.href.split('#')[0])
-      window.history.pushState(hash, '', document.location.href + '#' + hash);
     },
 
     async fullSync() {
-      // const keys: string[] = await idb.keys();
-      // for (const i of keys) {
-      //   await idb.del(i);
-      // }
-
       await this.changeOrder();
       this.order.forEach(this.syncGroup);
     },

@@ -63,6 +63,7 @@ const deleteGroup = () => {
   margin: 15px 20px 15px;
   overflow: hidden;
   border: 1px solid transparent;
+  user-select: none;
 
   &.sortable-chosen:not(.sortable-ghost) {
     filter: brightness(1.2);

@@ -19,7 +19,7 @@ onBeforeMount(() => {
 
 onMounted(async () => {
   await CapacitorApp.addListener('backButton', async () => {
-    if (!window.location.hash) {
+    if (store.isStart) {
       if (confirmExit.value) {
         await CapacitorApp.exitApp();
       } else {
@@ -32,11 +32,13 @@ onMounted(async () => {
       return;
     }
 
-    window.history.back();
+    store.popStateHandler();
+    // window.history.back();
   });
 
-  window.onpopstate = () => {
-    store.popStateHandler();
+  window.onpopstate = (e) => {
+    e.preventDefault();
+    // store.popStateHandler();
   }
 })
 </script>

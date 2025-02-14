@@ -3,7 +3,7 @@ import {computed, ref, shallowRef} from "vue";
 import {ElButton, ElCheckbox, ElDialog, ElDrawer, ElInput, ElMessage, ElOption, ElScrollbar, ElSelect} from "element-plus";
 import {useStore} from "../stores";
 import {Plus, Upload} from "@element-plus/icons-vue";
-import {helpers} from "../helpers.ts";
+import {openFileInBrowser} from "../helpers.ts";
 
 const store = useStore();
 const inputRef = ref();
@@ -51,6 +51,12 @@ const onOpen = () => {
   })
 }
 
+const onClose = () => {
+  store.backHandler(() => {
+    store.backGroups();
+  })
+}
+
 const openImport = () => {
   isShow.value = false;
   dialogVisible.value = true;
@@ -89,7 +95,7 @@ const convertToArray = () => {
 }
 
 const openFile = async () => {
-  fileStr.value = await helpers('.csv');
+  fileStr.value = await openFileInBrowser('.csv');
 
   if (!fileStr.value) {
     fileStr.value = '';
@@ -207,7 +213,7 @@ const onCloseImport = () => {
   <div>
     <el-button size="large" :icon="Plus" @click="isShow = true" plain circle />
 
-    <el-drawer v-model="isShow" size="100%" @opened="onOpen" >
+    <el-drawer v-model="isShow" size="100%" @opened="onOpen" @close="onClose">
       <template #header>
         <div class="title">
           <h4>Добавление студентов</h4>
@@ -218,21 +224,21 @@ const onCloseImport = () => {
         <div class="item mb-2">
           <label>Фамилия <span class="required">*</span></label>
           <div class="d-flex align-items-center justify-content-start">
-            <el-input ref="inputRef" v-model="studentSurname" size="large"/>
+            <el-input ref="inputRef" v-model="studentSurname" size="large" @input="val => studentSurname = val"/>
           </div>
         </div>
 
         <div class="item mb-2">
           <label>Имя</label>
           <div class="d-flex align-items-center justify-content-start">
-            <el-input v-model="studentName" size="large"/>
+            <el-input v-model="studentName" size="large" @input="val => studentName = val"/>
           </div>
         </div>
 
         <div class="item mb-3">
           <label>Отчество</label>
           <div class="d-flex align-items-center justify-content-start">
-            <el-input v-model="studentPatroname" size="large"/>
+            <el-input v-model="studentPatroname" size="large" @input="val => studentPatroname = val"/>
           </div>
         </div>
 
@@ -240,7 +246,7 @@ const onCloseImport = () => {
       </template>
       <template #footer>
         <div class="d-flex align-items-center justify-content-between">
-          <el-button type="primary" size="large" @click="addStudent" :disabled="!studentSurname.length">Добавить студента</el-button>
+          <el-button type="primary" size="large" @click="inputRef?.focus(); addStudent();" :disabled="!studentSurname.length">Добавить студента</el-button>
           <el-button type="primary" size="large" :icon="Upload" @click="openImport">Импорт</el-button>
         </div>
       </template>
@@ -269,7 +275,7 @@ const onCloseImport = () => {
       <div v-if="fileStr" class="d-flex align-items-center justify-content-center mt-3 mb-2">
         <p class="me-4">Разделитель: </p>
 
-        <el-input v-model="csvDelimiter" style="width: 70px;" class="me-3"/>
+        <el-input v-model="csvDelimiter" style="width: 70px;" class="me-3" @input="val => csvDelimiter = val"/>
 
         <el-select v-model="csvDelimiter" style="width: 120px;" @change="convertToArray">
           <el-option v-for="item in [{v: ',', d: ', (зпт.)'}, {v:';', d: '; (тчк.зпт.)'}]" :key="item.v" :label="item.d" :value="item.v" />

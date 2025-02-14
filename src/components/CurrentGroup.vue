@@ -92,7 +92,7 @@ onMounted(() => {
           </el-popconfirm>
         </template>
         <template #default>
-          <Calendar :student="student" @addEvent="(data) => addEstToStudent(key, data)" :renderKey="renderKeys[key]"/>
+          <Calendar :student="student" @addEvent="(data) => addEstToStudent(key, data)" :renderKey="renderKeys[key]" :id="key"/>
         </template>
       </el-collapse-item>
     </el-collapse>
