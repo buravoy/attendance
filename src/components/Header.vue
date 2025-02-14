@@ -5,6 +5,7 @@ import {useStore} from "../stores";
 import NewStudent from "./NewStudent.vue";
 import {nextTick, onMounted, ref} from "vue";
 import Menu from "./Menu.vue";
+import {getColorByBgColor} from "../helpers.ts";
 
 const store = useStore();
 const newGroupRef = ref();
@@ -18,10 +19,10 @@ onMounted(() => {
 
 <template>
   <header :style="{backgroundColor: store.currentGroup?.meta.color}">
-    <div v-if="store.backCb" class="back header-btn" @click="store.backCb()">
+    <div v-if="store.backCb" class="back header-btn" @click="store.backCb()" :style="{color: getColorByBgColor(store.currentGroup?.meta.color)}">
       <Back class="icon"/>
     </div>
-    <div class="title" :class="{'ms-3': !store.backCb}">
+    <div class="title" :class="{'ms-3': !store.backCb}" :style="{color: getColorByBgColor(store.currentGroup?.meta.color)}">
       <h4>{{ store.title }} {{`${!store.currentGroup ? '(' + store.order.length + ')' : '(' + store.currentGroup.students.length + ')'}`}}</h4>
       <p v-if="store.desc">{{store.desc}}</p>
     </div>

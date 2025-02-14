@@ -51,10 +51,13 @@ export const useStore = defineStore('Store', {
     },
 
     async fullSync() {
-      const keys: string[] = await idb.keys();
-      for (const i of keys) {
-        await idb.del(i);
-      }
+      // const keys: string[] = await idb.keys();
+      // for (const i of keys) {
+      //   await idb.del(i);
+      // }
+
+      await this.changeOrder();
+      this.order.forEach(this.syncGroup);
     },
 
     async changeOrder() {

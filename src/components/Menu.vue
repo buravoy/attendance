@@ -3,7 +3,7 @@ import {shallowRef} from "vue";
 import {ElButton, ElSwitch, ElDrawer, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Download, Operation, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser} from "../openFileInBrowser.ts";
+import {helpers, merge} from "../helpers.ts";
 
 const store = useStore();
 const isShow = shallowRef(false);
@@ -38,15 +38,12 @@ const exportData = () => {
 
 const importData = async () => {
   try {
-    const file = await openFileInBrowser('.json');
+    const file = await helpers('.json');
     const {groups, order} = JSON.parse(file!)
-    store.groups = groups;
-    store.order = store.keys = order;
-
+    Object.assign(store.groups, groups);
+    store.order = merge(store.order, order);
+    store.keys = store.order;
     await store.fullSync();
-    await store.changeOrder();
-    store.order.forEach(store.syncGroup);
-
     isShow.value = false;
 
     ElMessage({

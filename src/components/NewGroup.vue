@@ -8,7 +8,7 @@ const store = useStore();
 const inputRef = ref();
 const isShow = shallowRef(false);
 const editId = shallowRef<string | undefined>(undefined);
-const groupColor = shallowRef<string | undefined>('#2c2d2e');
+const groupColor = shallowRef<string | undefined>(store.dark ? '#E1E1E1' : '#2c2d2e');
 
 const groupName = shallowRef('')
 const groupDescription = shallowRef('')
@@ -25,7 +25,7 @@ const addNew = async () => {
 
   groupName.value = '';
   groupDescription.value = '';
-  groupColor.value = '#2c2d2e';
+  groupColor.value = store.dark ? '#E1E1E1' : '#2c2d2e';
 
   ElMessage({
     message: `Создана группа ${groupName.value}`,
@@ -40,10 +40,12 @@ const onClose = () => {
   if (editId.value) {
     groupName.value = '';
     groupDescription.value = '';
-    groupColor.value = '#2c2d2e';
+    groupColor.value = store.dark ? '#E1E1E1' : '#2c2d2e';
     editId.value = undefined;
   }
 }
+
+
 
 const onOpen = () => {
   setTimeout(inputRef.value?.focus, 200);
@@ -87,7 +89,9 @@ defineExpose({
   <div>
     <el-button size="large" class="" :icon="Plus" @click="isShow = true" plain circle />
 
-    <el-drawer v-model="isShow" size="100%" @opened="onOpen" @closed="onClose">
+    <el-drawer v-model="isShow" size="100%"
+               @open="editId ? false : groupColor = store.dark ? '#E1E1E1' : '#2c2d2e'"
+               @opened="onOpen" @closed="onClose">
       <template #header>
         <h4 v-if="!editId">Добавление группы</h4>
         <h4 v-if="editId">Редактирование группы</h4>
@@ -100,7 +104,7 @@ defineExpose({
             <el-color-picker v-model="groupColor"
                              size="large"
                              @activeChange="(val) => groupColor = val!"
-                             :predefine="['#2c2d2e', '#409eff', '#6f42c1', '#d63384', '#67c23a', '#fd7e14', '#ffc107', '#20c997', '#0dcaf0']"
+                             :predefine="[ store.dark ? '#E1E1E1' : '#2c2d2e', '#409eff', '#6f42c1', '#d63384', '#67c23a', '#fd7e14', '#ffc107', '#20c997', '#0dcaf0']"
             />
           </div>
         </div>

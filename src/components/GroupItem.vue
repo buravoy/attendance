@@ -2,6 +2,7 @@
 import {Delete, Edit, MoreFilled} from "@element-plus/icons-vue";
 import {ElButton, ElDialog, ElDropdown, ElDropdownItem, ElDropdownMenu} from "element-plus";
 import {ref} from "vue";
+import {getColorByBgColor} from "../helpers.ts";
 
 const emit = defineEmits(['open', 'remove', 'edit']);
 
@@ -18,7 +19,7 @@ const deleteGroup = () => {
 </script>
 
 <template>
-  <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}" :style="{backgroundColor: data?.meta?.color}">
+  <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}" :style="{backgroundColor: data?.meta?.color, color: getColorByBgColor(data?.meta?.color)}">
 
     <div class="group-info" @click="emit('open')">
       <p class="title">{{data?.meta?.name}}</p>
@@ -27,7 +28,7 @@ const deleteGroup = () => {
     </div>
 
     <el-dropdown placement="top-start" class="ms-auto" trigger="click">
-      <div class="group-control">
+      <div class="group-control" :style="{color: getColorByBgColor(data?.meta?.color)}">
         <MoreFilled class="icon" size="24"/>
       </div>
 

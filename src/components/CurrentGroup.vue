@@ -147,10 +147,10 @@ onMounted(() => {
     }
 
     &:nth-child(odd) {
-      background-color: var(--el-color-info-light-7);
+      --el-collapse-header-bg-color: var(--el-color-info-light-7);
     }
     &:nth-child(even) {
-      background-color: var(--el-color-info-light-9);
+      --el-collapse-header-bg-color: var(--el-color-info-light-9);
     }
   }
 }

@@ -3,7 +3,7 @@ import {computed, ref, shallowRef} from "vue";
 import {ElButton, ElCheckbox, ElDialog, ElDrawer, ElInput, ElMessage, ElOption, ElScrollbar, ElSelect} from "element-plus";
 import {useStore} from "../stores";
 import {Plus, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser} from "../openFileInBrowser.ts";
+import {helpers} from "../helpers.ts";
 
 const store = useStore();
 const inputRef = ref();
@@ -89,7 +89,7 @@ const convertToArray = () => {
 }
 
 const openFile = async () => {
-  fileStr.value = await openFileInBrowser('.csv');
+  fileStr.value = await helpers('.csv');
 
   if (!fileStr.value) {
     fileStr.value = '';
