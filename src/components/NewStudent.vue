@@ -3,7 +3,7 @@ import {computed, ref, shallowRef} from "vue";
 import {ElButton, ElCheckbox, ElDialog, ElDrawer, ElInput, ElMessage, ElOption, ElScrollbar, ElSelect} from "element-plus";
 import {useStore} from "../stores";
 import {Plus, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser} from "../helpers.ts";
+import {isMobile, openFileInBrowser} from "../helpers.ts";
 
 const store = useStore();
 const inputRef = ref();
@@ -211,9 +211,11 @@ const onCloseImport = () => {
 
 <template>
   <div>
-    <el-button size="large" :icon="Plus" @click="isShow = true" plain circle />
+    <div class="header-btn" @click="isShow = true">
+      <el-button size="large" :icon="Plus"plain circle />
+    </div>
 
-    <el-drawer v-model="isShow" size="100%" @opened="onOpen" @close="onClose">
+    <el-drawer v-model="isShow" :size="isMobile() ? '100%' : '800px'" @opened="onOpen" @close="onClose">
       <template #header>
         <div class="title">
           <h4>Добавление студентов</h4>

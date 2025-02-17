@@ -18,34 +18,64 @@ onMounted(() => {
 </script>
 
 <template>
-  <header :style="{backgroundColor: store.currentGroup?.meta.color}">
-    <div v-if="store.backCb" class="back header-btn" @click="store.backCb()" :style="{color: getColorByBgColor(store.currentGroup?.meta.color)}">
-      <Back class="icon"/>
-    </div>
-    <div class="title" :class="{'ms-3': !store.backCb}" :style="{color: getColorByBgColor(store.currentGroup?.meta.color)}">
-      <h4>{{ store.title }} {{`${!store.currentGroup ? '(' + store.order.length + ')' : '(' + store.currentGroup.students.length + ')'}`}}</h4>
-      <p v-if="store.desc">{{store.desc}}</p>
-    </div>
-    <div class="control ms-auto">
-      <NewGroup ref="newGroupRef" v-show="!store.currentGroup" class="header-btn"/>
-      <NewStudent v-if="store.currentGroup" class="header-btn"/>
-      <Menu class="header-btn"/>
-    </div>
-  </header>
+  <div class="header-wrap" :style="{backgroundColor: store.currentGroup?.meta.color}">
+    <header>
+      <div v-if="store.backCb" class="back header-btn" @click="store.backCb()" :style="{color: getColorByBgColor(store.currentGroup?.meta.color)}">
+        <Back class="icon"/>
+      </div>
+      <div class="title" :class="{'ms-3': !store.backCb}" :style="{color: getColorByBgColor(store.currentGroup?.meta.color)}">
+        <h4>{{ store.title }} {{`${!store.currentGroup ? '(' + store.order.length + ')' : '(' + store.currentGroup.students.length + ')'}`}}</h4>
+        <p v-if="store.desc">{{store.desc}}</p>
+      </div>
+      <div class="control ms-auto">
+        <NewGroup ref="newGroupRef" v-show="!store.currentGroup" />
+        <NewStudent v-if="store.currentGroup" />
+        <Menu />
+      </div>
+    </header>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.header-btn {
+.header-wrap {
+  background-color: var(--el-color-primary-light-9);
+}
+
+:deep(.header-btn) {
   min-width: var(--at-header-height);
   height: var(--at-header-height);
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
 
-  :deep(.el-button) {
+  &:before {
+    position: absolute;
+    content: '';
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: transparent;
+    transition: .2s;
+    opacity: 0;
+    z-index: 0;
+  }
+
+  &:hover {
+    &:before {
+      background-color: var(--el-color-black);
+      opacity: .1;
+    }
+  }
+
+  .el-button {
     border: none;
     position: relative;
     overflow: hidden;
+    pointer-events: none;
 
     &:before {
       content: '';
@@ -70,7 +100,8 @@ header {
   height: var(--at-header-height);
   display: flex;
   align-items: center;
-  background-color: var(--el-color-primary-light-9);
+  max-width: 800px;
+  margin: auto;
 }
 
 
@@ -92,6 +123,7 @@ header {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-left: 10px;
   }
 
   p {

@@ -31,6 +31,8 @@ export const useStore = defineStore('Store', {
     scrollRef: <any>undefined,
     newGroupRef: <any>undefined,
     dark: false,
+    multiCollapse: false,
+    calendarSync: false,
     isStart: false,
   }),
 

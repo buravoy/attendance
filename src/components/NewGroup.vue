@@ -3,6 +3,7 @@ import {ref, shallowRef} from "vue";
 import {ElButton, ElColorPicker, ElDrawer, ElInput, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Plus} from "@element-plus/icons-vue";
+import {isMobile} from "../helpers.ts";
 
 const store = useStore();
 const inputRef = ref();
@@ -91,9 +92,12 @@ defineExpose({
 
 <template>
   <div>
-    <el-button size="large" class="" :icon="Plus" @click="isShow = true" plain circle />
+    <div class="header-btn" @click="isShow = true">
+      <el-button size="large" class="" :icon="Plus"  plain circle />
+    </div>
 
-    <el-drawer v-model="isShow" size="100%"
+
+    <el-drawer v-model="isShow" :size="isMobile() ? '100%' : '800px'"
                @open="editId ? false : groupColor = store.dark ? '#E1E1E1' : '#2c2d2e'"
                @opened="onOpen" @closed="onClose">
       <template #header>

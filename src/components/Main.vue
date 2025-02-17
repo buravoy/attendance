@@ -33,5 +33,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .scroll {
   height: calc(100vh - var(--at-header-height) - 1px);
+  max-width: 800px;
+  margin: auto;
 }
 </style>
