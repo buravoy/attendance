@@ -19,7 +19,8 @@ const deleteGroup = () => {
 </script>
 
 <template>
-  <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}" :style="{backgroundColor: data?.meta?.color, color: getColorByBgColor(data?.meta?.color)}">
+  <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}"
+       :style="{backgroundColor: data?.meta?.color, color: getColorByBgColor(data?.meta?.color)}">
 
     <div class="group-info" @click="emit('open')">
       <p class="title">{{data?.meta?.name}}</p>
@@ -65,8 +66,14 @@ const deleteGroup = () => {
   border: 1px solid transparent;
   user-select: none;
 
+  &:hover {
+    cursor: pointer;
+    filter: brightness(.9);
+  }
+
   &.sortable-chosen:not(.sortable-ghost) {
     filter: brightness(1.2);
+    cursor: grab;
   }
 
   &.sortable-chosen.sortable-ghost {

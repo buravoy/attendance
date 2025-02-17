@@ -6,7 +6,7 @@ import Calendar from "./Calendar.vue";
 import {Delete} from "@element-plus/icons-vue";
 
 const store = useStore();
-const activeName = ref<string>()
+const activeName = ref<string | string[]>(store.multiCollapse ? '' : [])
 const renderKeys = ref<number[]>([]);
 
 const studentTitle = (student: any) => {
@@ -33,8 +33,10 @@ const addEstToStudent = (key: number, data: any) => {
 }
 
 const initCalendar = (id: CollapseModelValue) => {
-  if (typeof id != 'number') return;
-  renderKeys.value[id]++;
+  switch (typeof id) {
+    case "number": return renderKeys.value[id]++;
+    case "object": return id.forEach(i => renderKeys.value[i]++);
+  }
 }
 
 const studentAttendance = (attendance: any) => {
@@ -63,23 +65,35 @@ const removeStudent = (key: number) => {
   store.syncGroup();
 }
 
+const syncScroll = (e) => {
+  renderKeys.value.forEach((_, i) => {
+
+    const target = document.getElementById('scrollRef' + i);
+
+    console.log(target)
+
+    document.getElementById('scrollRef' + i).scrollTo({
+      left: e.scrollLeft,
+    })
+  })
+}
+
 watch(() => store.currentGroup?.students, () => {
   renderKeys.value = store.currentGroup?.students.map((_: never, i: number) => (renderKeys.value[i] > 0) ? renderKeys.value[i] : 0);
 }, { deep: true })
 
 onMounted(() => {
   renderKeys.value = store.currentGroup?.students.map(() => 0);
-
   store.backHandler(store.backCb!);
 })
 </script>
 
 <template>
   <div class="p-3">
-    <el-collapse v-if="store.currentGroup?.students.length" v-model="activeName" accordion @change="initCalendar" >
+    <el-collapse v-if="store.currentGroup?.students.length" v-model="activeName" :accordion="store.multiCollapse" @change="initCalendar" >
       <el-collapse-item v-for="(student, key) in store.currentGroup?.students" :name="key" >
         <template #title>
-          <span>{{activeName == key.toString() ? `${student.surname} ${student.name} ${student.patroname}` : studentTitle(student)}}</span>
+          <span>{{student.surname}} {{student.name}} {{student.patroname}}</span>
           <div class="d-inline-flex ms-auto me-2" v-html="studentAttendance(student.attendance)"/>
           <el-popconfirm width="220" :title="`Удалить ${studentTitle(student)} и все его данные?`" @confirm="removeStudent(key)" hide-icon>
             <template #reference>
@@ -92,7 +106,12 @@ onMounted(() => {
           </el-popconfirm>
         </template>
         <template #default>
-          <Calendar :student="student" @addEvent="(data) => addEstToStudent(key, data)" :renderKey="renderKeys[key]" :id="key"/>
+          <Calendar :student="student"
+                    @addEvent="(data) => addEstToStudent(key, data)"
+                    @scroll="syncScroll"
+                    :renderKey="renderKeys[key]"
+                    :id="key"
+          />
         </template>
       </el-collapse-item>
     </el-collapse>
@@ -148,9 +167,22 @@ onMounted(() => {
 
     &:nth-child(odd) {
       --el-collapse-header-bg-color: var(--el-color-info-light-7);
+
+      .el-collapse-item__header {
+        &:hover {
+          filter: brightness(0.9);
+        }
+      }
     }
+
     &:nth-child(even) {
       --el-collapse-header-bg-color: var(--el-color-info-light-9);
+
+      .el-collapse-item__header {
+        &:hover {
+          filter: brightness(0.85);
+        }
+      }
     }
   }
 }

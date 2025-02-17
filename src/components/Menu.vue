@@ -80,12 +80,15 @@ const importData = async () => {
 
 const changeTheme = (val: boolean) => {
   document.documentElement.classList.toggle('dark', !val);
+  return val ? localStorage.setItem('dark', '1') : localStorage.removeItem('dark');
+}
 
-  if (val) {
-    localStorage.setItem('dark', '1');
-  } else {
-    localStorage.removeItem('dark');
-  }
+const changeMulti = (val: boolean) => {
+  return val ? localStorage.setItem('multi', '1') : localStorage.removeItem('multi');
+}
+
+const changeSync = (val: boolean) => {
+  return val ? localStorage.setItem('sync', '1') : localStorage.removeItem('sync');
 }
 </script>
 
@@ -103,9 +106,18 @@ const changeTheme = (val: boolean) => {
         <div class="d-flex flex-column">
           <el-switch v-model="store.dark" size="large" class="mb-3"
                      :active-text="`${store.dark ? 'Светлая' : 'Темная'} тема`"
-                     @change="changeTheme as any"/>
-          <el-switch v-model="store.multiCollapse" size="large" class="mb-3" :active-text="`Разворачивать ${store.multiCollapse ? 'по одному' : 'всех'}`" />
-          <el-switch v-model="store.calendarSync" size="large" class="mb-5" active-text="Синхронизировать календари" />
+                     @change="changeTheme as any"
+          />
+
+          <el-switch v-model="store.multiCollapse" size="large" class="mb-3"
+                     :active-text="`Разворачивать ${store.multiCollapse ? 'по одному' : 'всех'}`"
+                     @change="changeMulti as any"
+          />
+
+          <el-switch v-model="store.calendarSync" size="large" class="mb-5"
+                     active-text="Синхронизировать календари"
+                     @change="changeSync as any"
+          />
 
           <el-button type="primary" size="large"  :icon="List" @click="exportData">Экспорт в CSV</el-button>
 

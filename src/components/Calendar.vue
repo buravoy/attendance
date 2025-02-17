@@ -4,6 +4,7 @@ import {ElButton, ElDialog, ElRadio, ElRadioGroup, ElScrollbar} from "element-pl
 import {CaretLeft, CaretRight, Delete} from "@element-plus/icons-vue";
 import {nextTick, ref, shallowRef, watch} from "vue";
 import {useStore} from "../stores";
+import {isMobile} from "../helpers.ts";
 
 const props = defineProps({
   student: Object,
@@ -17,7 +18,7 @@ const scrollRef = ref();
 const currentDate = ref(new Date());
 const events = shallowRef(['Н', '1', '2', '3', '4', '5']);
 const currentEvent = shallowRef('Н')
-const emit = defineEmits(['addEvent']);
+const emit = defineEmits(['addEvent', 'scroll']);
 const store = useStore();
 
 const makeDate = (month: number, year: number, day: number) => {
@@ -53,12 +54,7 @@ const prevMonth = () => {
 }
 
 const isToday = (day: number) => {
-  const today = new Date().toLocaleDateString() == makeDate(currentDate.value.getMonth() + 1, currentDate.value.getFullYear(), day).toLocaleDateString();
-
-  // console.log(today)
-
-  // return new Date().toLocaleDateString() == makeDate(currentDate.value.getMonth() + 1, currentDate.value.getFullYear(), day).toLocaleDateString()
-  return today
+  return new Date().toLocaleDateString() == makeDate(currentDate.value.getMonth() + 1, currentDate.value.getFullYear(), day).toLocaleDateString()
 }
 
 const openEvents = (date: Date) => {
@@ -125,6 +121,8 @@ watch(() => props.renderKey, () => {
       scrollRef.value.scrollTo({
         left: today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2)
       });
+
+      setTimeout(window.dragscroll.reset);
     })
   }
 })
@@ -132,7 +130,7 @@ watch(() => props.renderKey, () => {
 
 <template>
   <div class="calendar">
-    <div class="ym-control">
+    <div class="ym-control"> {{renderKey}}
       <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth"/>
       <div class="y-m" @contextmenu.prevent="goToToday">
         <div class="month">{{currentDate.toLocaleString('default', { month: 'long' })}}</div>
@@ -141,13 +139,14 @@ watch(() => props.renderKey, () => {
       <el-button :icon="CaretRight" size="small" circle plain type="info" @click="nextMonth"/>
     </div>
 
-    <el-scrollbar ref="scrollRef">
+    <el-scrollbar ref="scrollRef" :id="'scrollRef' + id" wrap-class="dragscroll" @scroll="(e) => emit('scroll', e)">
       <div  class="days">
         <div v-for="day in daysInMonth(currentDate.getMonth() + 1, currentDate.getFullYear())"
              class="day"
              :id="isToday(day) ? 'todayRef' + id : undefined"
              :class="{today: isToday(day), weekend: ['сб', 'вс'].includes(dayName(currentDate.getMonth() + 1, currentDate.getFullYear(), day))}"
-             @contextmenu.prevent="openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
+             @contextmenu.prevent="isMobile() ? openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day)) : undefined"
+             @dblclick="isMobile() ? undefined : openEvents(makeDate(currentDate.getMonth() + 1, currentDate.getFullYear(), day))"
         >
           <div class="day-name">
             {{day}} <span>{{dayName(currentDate.getMonth() + 1, currentDate.getFullYear(), day)}}</span>

@@ -11,6 +11,10 @@ const store = useStore();
 
 onBeforeMount(() => {
   const dark = localStorage.getItem('dark');
+
+  store.multiCollapse = !!localStorage.getItem('multi');
+  store.calendarSync = !!localStorage.getItem('sync');
+
   if (dark) {
     store.dark = true;
     document.documentElement.classList.toggle('dark', !store.dark);
@@ -33,13 +37,9 @@ onMounted(async () => {
     }
 
     store.popStateHandler();
-    // window.history.back();
   });
 
-  window.onpopstate = (e) => {
-    e.preventDefault();
-    // store.popStateHandler();
-  }
+  window.onpopstate = (e) => e.preventDefault();
 })
 </script>
 
