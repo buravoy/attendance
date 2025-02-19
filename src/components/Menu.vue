@@ -6,6 +6,7 @@ import {Download, List, Operation, Upload} from "@element-plus/icons-vue";
 import {openFileInBrowser, merge, jsonToBase64, isMobile} from "../helpers.ts";
 import {Directory, Filesystem} from "@capacitor/filesystem";
 import {Share} from "@capacitor/share";
+import {writeFileXLSX} from "xlsx";
 
 const store = useStore();
 const isShow = shallowRef(false);
@@ -90,6 +91,56 @@ const changeMulti = (val: boolean) => {
 const changeSync = (val: boolean) => {
   return val ? localStorage.setItem('sync', '1') : localStorage.removeItem('sync');
 }
+
+const exportToCSV = () => {
+  const filename = 'attendance_export_' + new Date().toDateString().replaceAll(' ', '_') + '.xlsx';
+  let Sheets: any = {};
+
+  const SheetNames = store.order.map((i: string) => {
+    const {meta, students} = store.groups[i];
+    Sheets[meta.name] = {'!ref': 'A1:B9999'};
+
+    for (const s of students) {
+      const s_i: number = students.indexOf(s) + 1;
+      const name = 'A' + s_i;
+      const att = 'B' + s_i;
+      const {attendance} = s;
+
+      let att_val = '';
+
+      const sortedAttendance = Object.keys(attendance).sort((a: string, b: string) => {
+        const _a = a.split('.');
+        const _b = b.split('.');
+        return new Date(+_a[2], +_a[1] - 1, +_a[0]).getTime() - new Date(+_b[2], +_b[1] - 1, +_b[0]).getTime()
+      });
+
+      let count = 1;
+
+      for (const a of sortedAttendance) {
+        att_val += `${a}: ${attendance[a].join(', ')} ${count == sortedAttendance.length ? '' : '\n'}`;
+        count++
+      }
+
+      Sheets[meta.name][name] = {
+        v: `${s.surname} ${s.name} ${s.patroname}`
+      }
+      Sheets[meta.name][att] = {
+        v: att_val
+      }
+    }
+
+
+    return meta.name
+  });
+
+  const workBook = {
+    Sheets,
+    SheetNames
+  }
+
+  writeFileXLSX(workBook, filename + '.xlsx');
+
+}
 </script>
 
 <template>
@@ -119,8 +170,7 @@ const changeSync = (val: boolean) => {
                      @change="changeSync as any"
           />
 
-          <el-button type="primary" size="large"  :icon="List" @click="exportData">Экспорт в CSV</el-button>
-
+          <el-button type="primary" size="large"  :icon="List" @click="exportToCSV">Экспорт в CSV</el-button>
 
           <div class="divider"></div>
 

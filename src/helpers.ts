@@ -19,6 +19,15 @@ export const openFileInBrowser = (accept: string | null): Promise<string | null 
   link.click();
 })
 
+export const saveFileInBrowser = (file: any, filename: string) => {
+  const blob = new Blob([file]);
+  const fileUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = filename;
+  link.href = fileUrl;
+  link.click();
+}
+
 export const merge = (a: any, b: any, predicate = (a: any, b: any) => a === b) => {
   const c = [...a]; // copy to avoid side effects
   // add all items from B to copy C if they're not already present

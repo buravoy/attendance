@@ -136,9 +136,12 @@ defineExpose({
 
 <template>
   <div class="calendar">
-    <div class="ym-control"> {{store.calendarSync}}
+    <div class="ym-control">
       <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth(); emit('prev');"/>
-      <div class="y-m" @contextmenu.prevent="goToToday(); emit('today');">
+      <div class="y-m"
+           @contextmenu.prevent="goToToday(); emit('today');"
+           @dblclick="goToToday(); emit('today');"
+      >
         <div class="month">{{currentDate.toLocaleString('default', { month: 'long' })}}</div>
         <div class="year ms-2">{{currentDate.getFullYear()}}</div>
       </div>
@@ -187,8 +190,6 @@ defineExpose({
             <el-button @click="removeEvent(key)" :icon="Delete" text type="danger"/>
           </div>
         </div>
-
-
 
         <div class="d-flex flex-column justify-content-center align-items-center mt-4">
           <el-radio-group v-model="currentEvent" class="d-flex align-items-center">
@@ -239,6 +240,7 @@ defineExpose({
   .est {
     width: 100%;
     text-align: center;
+    background-color: var(--el-color-info-light-7);
   }
 
   .red {
@@ -273,6 +275,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   user-select: none;
+  cursor: pointer;
 }
 
 .days {
