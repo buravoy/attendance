@@ -18,7 +18,7 @@ const scrollRef = ref();
 const currentDate = ref(new Date());
 const events = shallowRef(['Н', '1', '2', '3', '4', '5']);
 const currentEvent = shallowRef('Н')
-const emit = defineEmits(['addEvent', 'scroll']);
+const emit = defineEmits(['addEvent', 'scroll', 'next', 'prev', 'today']);
 const store = useStore();
 
 const makeDate = (month: number, year: number, day: number) => {
@@ -36,12 +36,10 @@ const dayName =  (month: number, year: number, day: number) => {
 const nextMonth = () => {
   const currentMonth = currentDate.value.getMonth();
   const currentYear = currentDate.value.getFullYear();
-
-
   const nextMonth = (currentMonth + 1) > 11 ? 0 : currentMonth + 1;
   const nextYear = (currentMonth + 1) > 11 ? currentYear + 1 : currentYear;
 
-  currentDate.value = new Date(nextYear, nextMonth)
+  currentDate.value = new Date(nextYear, nextMonth);
 }
 
 const prevMonth = () => {
@@ -50,7 +48,7 @@ const prevMonth = () => {
   const prevMonth = (currentMonth - 1) < 0 ? 11 : currentMonth - 1;
   const prevYear = (currentMonth - 1) < 0 ? currentYear - 1 : currentYear;
 
-  currentDate.value = new Date(prevYear, prevMonth)
+  currentDate.value = new Date(prevYear, prevMonth);
 }
 
 const isToday = (day: number) => {
@@ -90,12 +88,15 @@ const goToToday = () => {
 
   nextTick(() => {
     const today: HTMLElement | null = document.getElementById('todayRef' + props.id)
+    if (!today) return;
+
     const {parentNode} = today as any;
 
     if (!today || !parentNode) return;
+    if (!store.syncScroll) store.syncScroll = today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2);
 
     scrollRef.value.scrollTo({
-      left: today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2)
+      left: today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2),
     });
   })
 }
@@ -117,29 +118,34 @@ watch(() => props.renderKey, () => {
       const {parentNode} = today as any;
 
       if (!today || !parentNode) return;
+      if (!store.syncScroll) store.syncScroll = today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2);
 
       scrollRef.value.scrollTo({
-        left: today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2)
+        left: store.calendarSync ? store.syncScroll : today.offsetLeft - (parentNode.clientWidth / 2) + (today.clientWidth / 2),
       });
 
       setTimeout(window.dragscroll.reset);
     })
   }
+});
+
+defineExpose({
+  nextMonth, prevMonth, goToToday
 })
 </script>
 
 <template>
   <div class="calendar">
-    <div class="ym-control"> {{renderKey}}
-      <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth"/>
-      <div class="y-m" @contextmenu.prevent="goToToday">
+    <div class="ym-control"> {{store.calendarSync}}
+      <el-button :icon="CaretLeft" size="small" circle plain type="info" @click="prevMonth(); emit('prev');"/>
+      <div class="y-m" @contextmenu.prevent="goToToday(); emit('today');">
         <div class="month">{{currentDate.toLocaleString('default', { month: 'long' })}}</div>
         <div class="year ms-2">{{currentDate.getFullYear()}}</div>
       </div>
-      <el-button :icon="CaretRight" size="small" circle plain type="info" @click="nextMonth"/>
+      <el-button :icon="CaretRight" size="small" circle plain type="info" @click="nextMonth(); emit('next');"/>
     </div>
 
-    <el-scrollbar ref="scrollRef" :id="'scrollRef' + id" wrap-class="dragscroll" @scroll="(e) => emit('scroll', e)">
+    <el-scrollbar ref="scrollRef" :id="'scrollRef' + id" :wrap-class="`dragscroll ${'scrollRef' + id}`" @scroll="(e) => emit('scroll', e)">
       <div  class="days">
         <div v-for="day in daysInMonth(currentDate.getMonth() + 1, currentDate.getFullYear())"
              class="day"
@@ -168,9 +174,11 @@ watch(() => props.renderKey, () => {
       day: 'numeric'
     })"
                destroy-on-close center
-               :close-on-click-modal="false" :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
+               :close-on-click-modal="false"
+               :class="{today: currentDate.toLocaleDateString() == eventDate?.toLocaleDateString()}"
                @opened="onOpen"
                @closed="onClose"
+               style="max-width: 300px"
     >
       <div v-if="eventDate">
         <div class="estimate-wrap">

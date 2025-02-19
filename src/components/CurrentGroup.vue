@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useStore} from "../stores";
-import {onMounted, ref, watch} from "vue";
+import {onMounted, type Ref, ref, watch} from "vue";
 import {type CollapseModelValue, ElButton, ElCollapse, ElCollapseItem, ElMessage, ElPopconfirm} from "element-plus";
 import Calendar from "./Calendar.vue";
 import {Delete} from "@element-plus/icons-vue";
@@ -65,15 +65,16 @@ const removeStudent = (key: number) => {
   store.syncGroup();
 }
 
-const syncScroll = (e) => {
+const syncScroll = (e: any) => {
+  if (!store.calendarSync) return;
+
   renderKeys.value.forEach((_, i) => {
+    const target = document.getElementsByClassName('scrollRef' + i)[0];
 
-    const target = document.getElementById('scrollRef' + i);
+    store.syncScroll = e.scrollLeft;
 
-    console.log(target)
-
-    document.getElementById('scrollRef' + i).scrollTo({
-      left: e.scrollLeft,
+    target?.scrollTo({
+      left: store.syncScroll,
     })
   })
 }
@@ -81,6 +82,26 @@ const syncScroll = (e) => {
 watch(() => store.currentGroup?.students, () => {
   renderKeys.value = store.currentGroup?.students.map((_: never, i: number) => (renderKeys.value[i] > 0) ? renderKeys.value[i] : 0);
 }, { deep: true })
+
+const refs = ref<Ref[]>([])
+
+const setRef = (row: number) => {
+  return refs.value[row] = ref()
+}
+
+const syncRefs = (direct: 'prev' | 'next' | 'today', key: number) => {
+  if (!store.calendarSync) return;
+
+  refs.value.forEach((ref, i) => {
+    if (i == key) return ;
+
+    switch (direct) {
+      case "next": return ref.value[0].nextMonth();
+      case "prev": return ref.value[0].prevMonth();
+      case "today": return ref.value[0].goToToday();
+    }
+  })
+}
 
 onMounted(() => {
   renderKeys.value = store.currentGroup?.students.map(() => 0);
@@ -109,8 +130,12 @@ onMounted(() => {
           <Calendar :student="student"
                     @addEvent="(data) => addEstToStudent(key, data)"
                     @scroll="syncScroll"
+                    @prev="syncRefs('prev', key)"
+                    @next="syncRefs('next', key)"
+                    @today="syncRefs('today', key)"
                     :renderKey="renderKeys[key]"
                     :id="key"
+                    :ref="setRef(key)"
           />
         </template>
       </el-collapse-item>

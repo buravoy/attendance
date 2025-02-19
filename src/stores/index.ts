@@ -34,6 +34,7 @@ export const useStore = defineStore('Store', {
     multiCollapse: false,
     calendarSync: false,
     isStart: false,
+    syncScroll: 0,
   }),
 
   actions: {

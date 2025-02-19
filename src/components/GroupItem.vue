@@ -41,17 +41,17 @@ const deleteGroup = () => {
       </template>
     </el-dropdown>
 
-    <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center>
-      <div class="text-center" style="line-height: 28px">Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="centerDialogVisible = false">Отмена</el-button>
-          <el-button type="danger" @click="deleteGroup">Удалить</el-button>
-        </div>
-      </template>
-    </el-dialog>
-  </div>
 
+  </div>
+  <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center style="max-width: 300px">
+    <div class="text-center" style="line-height: 28px">Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">Отмена</el-button>
+        <el-button type="danger" @click="deleteGroup">Удалить</el-button>
+      </div>
+    </template>
+  </el-dialog>
 
 
 

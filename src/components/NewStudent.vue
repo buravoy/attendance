@@ -212,7 +212,7 @@ const onCloseImport = () => {
 <template>
   <div>
     <div class="header-btn" @click="isShow = true">
-      <el-button size="large" :icon="Plus"plain circle />
+      <el-button size="large" :icon="Plus" plain circle />
     </div>
 
     <el-drawer v-model="isShow" :size="isMobile() ? '100%' : '800px'" @opened="onOpen" @close="onClose">
@@ -254,7 +254,12 @@ const onCloseImport = () => {
       </template>
     </el-drawer>
 
-    <el-dialog v-model="dialogVisible" title="Импорт из *.csv" @opened="onOpenImport" @closed="onCloseImport">
+    <el-dialog v-model="dialogVisible"
+               title="Импорт из *.csv"
+               @opened="onOpenImport"
+               @closed="onCloseImport"
+               :close-on-click-modal="false"
+               style="max-width: 750px">
       <el-scrollbar v-if="fileArray?.length" class="table-preview">
         <table>
           <thead>
