@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Прогульщик</string>
-    <string name="title_activity_main">Прогульщик</string>
+    <string name="app_name">Прогульщик 2.0</string>
+    <string name="title_activity_main">Прогульщик 2.0</string>
     <string name="package_name">com.attendance.app</string>
     <string name="custom_url_scheme">com.attendance.app</string>
 </resources>
