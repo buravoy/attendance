@@ -30,8 +30,9 @@ const exportData = async () => {
 
 const importData = async () => {
   try {
-    const file = await openFileInBrowser('.json');
-    const {groups, order} = JSON.parse(file!)
+    const [file] = await openFileInBrowser('.json') as unknown as File[];
+
+    const {groups, order} = JSON.parse(await file.text())
     Object.assign(store.groups, groups);
     store.order = merge(store.order, order);
     store.keys = JSON.parse(JSON.stringify(store.order));
