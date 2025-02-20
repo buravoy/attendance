@@ -26,7 +26,7 @@ const addEstToStudent = (key: number, data: any) => {
   store.syncGroup();
 
   ElMessage({
-    message: `${date}\nСтуденту ${studentTitle(store.currentGroup?.students[key])} поставлено ${est}`,
+    message: `${studentTitle(store.currentGroup?.students[key])} поставлено ${est}\n${date}`,
     type: 'success',
     showClose: true,
   });

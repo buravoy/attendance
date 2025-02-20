@@ -3,8 +3,8 @@ import {shallowRef} from "vue";
 import {ElButton, ElSwitch, ElDrawer, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Download, List, Operation, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser, merge, jsonToBase64, isMobile, saveFileInBrowser, getDateTimeString, saveFile} from "../helpers.ts";
-import {writeFileXLSX, writeXLSX} from "xlsx";
+import {openFileInBrowser, merge, isMobile, getDateTimeString, saveFile} from "../helpers.ts";
+import {writeXLSX} from "xlsx";
 
 const store = useStore();
 const isShow = shallowRef(false);

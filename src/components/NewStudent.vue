@@ -4,14 +4,13 @@ import {ElButton, ElCheckbox, ElDialog, ElDrawer, ElInput, ElMessage, ElOption, 
 import {useStore} from "../stores";
 import {Plus, Upload} from "@element-plus/icons-vue";
 import {isMobile, openFileInBrowser} from "../helpers.ts";
+import {read, utils} from "xlsx";
 
 const store = useStore();
 const inputRef = ref();
 const isShow = shallowRef(false);
 const dialogVisible = ref(false);
-const fileStr = ref<string | null >();
 const fileArray = ref<string[][]>();
-const csvDelimiter = ref<string>(';');
 const ignoreFirstLine = shallowRef(true);
 const chunkFIO = shallowRef(true);
 const cellOptions = shallowRef(['---', 'ФИО', 'Фамилия', 'Имя', 'Отчество']);
@@ -61,44 +60,13 @@ const openImport = () => {
   isShow.value = false;
   dialogVisible.value = true;
   fileArray.value = [];
-  fileStr.value = '';
-}
-
-const CSVToArray = ( strData: string, strDelimiter: string ) => {
-  strDelimiter = (strDelimiter || ",");
-  const objPattern = new RegExp(("(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
-      "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
-      "([^\"\\" + strDelimiter + "\\r\\n]*))"),"gi");
-
-  const arrData: any[] = [[]];
-  let arrMatches = null;
-  let strMatchedValue: any;
-  while (arrMatches = objPattern.exec( strData )){
-    const strMatchedDelimiter = arrMatches[ 1 ];
-    if (strMatchedDelimiter.length && (strMatchedDelimiter != strDelimiter)){
-      arrData.push( [] );
-    }
-    if (arrMatches[ 2 ]){
-      strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g" ),"\"");
-    } else {
-      strMatchedValue = arrMatches[3];
-    }
-    arrData[arrData.length - 1].push( strMatchedValue );
-  }
-  return(arrData);
-}
-
-const convertToArray = () => {
-  if (!fileStr.value) return;
-  fileArray.value = CSVToArray(fileStr.value, csvDelimiter.value);
-  cellOptVal.value = fileArray.value[0].map((_, i) => i == 0 ? 'ФИО' : '---');
 }
 
 const openFile = async () => {
-  fileStr.value = await openFileInBrowser('.csv');
+  const [file] = await openFileInBrowser('.xlsx') as unknown as File[];
+  const workbook = read(await file.arrayBuffer());
 
-  if (!fileStr.value) {
-    fileStr.value = '';
+  if (!workbook) {
     return ElMessage({
       message: `Файл не поддерживается`,
       type: 'error',
@@ -106,7 +74,9 @@ const openFile = async () => {
     });
   }
 
-  convertToArray()
+  fileArray.value = [];
+  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+  fileArray.value = utils.sheet_to_json(firstSheet, { header: 1 });
 }
 
 const changeOpt = (key: number, val: string) => {
@@ -255,7 +225,7 @@ const onCloseImport = () => {
     </el-drawer>
 
     <el-dialog v-model="dialogVisible"
-               title="Импорт из *.csv"
+               title="Импорт из Excel (*.xlsx)"
                @opened="onOpenImport"
                @closed="onCloseImport"
                :close-on-click-modal="false"
@@ -279,23 +249,13 @@ const onCloseImport = () => {
         </table>
       </el-scrollbar>
 
-      <div v-if="fileStr" class="d-flex align-items-center justify-content-center mt-3 mb-2">
-        <p class="me-4">Разделитель: </p>
-
-        <el-input v-model="csvDelimiter" style="width: 70px;" class="me-3" @input="val => csvDelimiter = val"/>
-
-        <el-select v-model="csvDelimiter" style="width: 120px;" @change="convertToArray">
-          <el-option v-for="item in [{v: ',', d: ', (зпт.)'}, {v:';', d: '; (тчк.зпт.)'}]" :key="item.v" :label="item.d" :value="item.v" />
-        </el-select>
-      </div>
-
       <div class="d-flex flex-column align-items-center mb-5">
-        <el-checkbox v-if="fileStr" v-model="ignoreFirstLine" label="Игнорировать первую строку" size="large" class="me-0" />
-        <el-checkbox v-if="fileStr" v-model="chunkFIO" label="Разбить ФИО по пробелам" size="large" />
+        <el-checkbox v-if="fileArray?.length" v-model="ignoreFirstLine" label="Игнорировать первую строку" size="large" class="me-0" />
+        <el-checkbox v-if="fileArray?.length" v-model="chunkFIO" label="Разбить ФИО по пробелам" size="large" />
       </div>
 
       <div class="text-center">
-        <el-button type="primary" size="large" @click="openFile">Выбрать {{fileStr ? 'другой' : ''}} файл</el-button>
+        <el-button type="primary" size="large" @click="openFile">Выбрать {{fileArray?.length ? 'другой' : ''}} файл</el-button>
       </div>
 
 
@@ -312,12 +272,27 @@ const onCloseImport = () => {
 <style scoped lang="scss">
 .table-preview {
   height: 200px;
-  padding-bottom: 15px;
+  border: 1px solid var(--el-color-info-light-3);
+  border-radius: 4px;
 
   table {
     min-width: 100%;
     border-collapse: collapse;
     tbody {
+      tr {
+        &:nth-child(odd) {
+          th {
+            background-color: var(--el-color-info-light-7);
+          }
+        }
+
+        &:nth-child(even) {
+          th {
+            background-color: var(--el-color-info-light-9);
+          }
+        }
+      }
+
       th {
         padding: 1px 2px;
       }
@@ -328,7 +303,7 @@ const onCloseImport = () => {
       top: 0;
       z-index: 1;
       background-color: var(--el-dialog-bg-color);
-      padding: 0 2px;
+      padding: 5px 2px;
     }
   }
 }
