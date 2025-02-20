@@ -3,8 +3,10 @@ import {shallowRef} from "vue";
 import {ElButton, ElSwitch, ElDrawer, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Download, List, Operation, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser, merge, isMobile, getDateTimeString, saveFile} from "../helpers.ts";
+import {openFileInBrowser, merge, isMobile, getDateTimeString, saveFile, saveFileInBrowser} from "../helpers.ts";
 import {writeXLSX} from "xlsx";
+import {Device} from "@capacitor/device";
+import {Encoding} from "@capacitor/filesystem";
 
 const store = useStore();
 const isShow = shallowRef(false);
@@ -24,7 +26,7 @@ const exportData = async () => {
   const {groups, order} = store;
   const filename = 'progulschik_backup_' + getDateTimeString() + '.json';
   const json = JSON.stringify({groups, order});
-  await saveFile(json, filename);
+  await saveFile(json, filename, Encoding.UTF8);
   isShow.value = false;
 }
 
@@ -59,10 +61,16 @@ const changeTheme = (val: boolean) => {
 }
 
 const changeMulti = (val: boolean) => {
+  if (val) {
+    store.calendarSync = false;
+  }
+
   return val ? localStorage.setItem('multi', '1') : localStorage.removeItem('multi');
 }
 
 const changeSync = (val: boolean) => {
+
+
   return val ? localStorage.setItem('sync', '1') : localStorage.removeItem('sync');
 }
 
@@ -122,7 +130,12 @@ const exportToXLS = async () => {
     SheetNames
   }
 
-  const data = writeXLSX(workBook, {type: "array"});
+  const info = await Device.getInfo();
+
+  const data = writeXLSX(workBook, {
+    type: info.platform == 'web' ? "array" : "base64"
+  });
+
   await saveFile(data, filename);
   isShow.value = false;
 }
@@ -152,6 +165,7 @@ const exportToXLS = async () => {
 
           <el-switch v-model="store.calendarSync" size="large" class="mb-5"
                      active-text="Синхронизировать календари"
+                     :disabled="store.multiCollapse"
                      @change="changeSync as any"
           />
 

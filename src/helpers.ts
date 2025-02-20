@@ -59,11 +59,11 @@ export const getDateTimeString = () => {
   return new Date().toLocaleString('default', {hour12: false}).replaceAll('/', '_').replaceAll(',', '').replaceAll(':', '_').replaceAll(' ', '_');
 }
 
-export const saveFile = async (str: string, filename: string) => {
+export const saveFile = async (data: any, filename: string, encoding?: Encoding.UTF8) => {
   const info = await Device.getInfo();
 
   if (info.platform == 'web') {
-    return saveFileInBrowser(str, filename);
+    return saveFileInBrowser(data, filename);
   }
 
   let permission = await Filesystem.checkPermissions();
@@ -78,14 +78,14 @@ export const saveFile = async (str: string, filename: string) => {
 
   Filesystem.writeFile({
     path: '/../Download/' + filename,
-    data: str,
+    data: data,
     directory: Directory.Documents,
-    encoding: Encoding.UTF8
+    encoding: encoding
   }).then((res) => {
     console.log(res)
 
     ElMessage({
-      message: 'Бекап сохранен',
+      message: 'Файл сохранен в Downloads',
       type: 'success',
       showClose: true,
     })
