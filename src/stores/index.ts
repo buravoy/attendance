@@ -54,6 +54,7 @@ export const useStore = defineStore('Store', {
     async fullSync() {
       await this.changeOrder();
       this.order.forEach(this.syncGroup);
+      this.keys = JSON.parse(JSON.stringify(this.order));
     },
 
     async changeOrder() {

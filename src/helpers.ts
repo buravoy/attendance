@@ -1,4 +1,7 @@
 import {Buffer} from "buffer";
+import {Device} from "@capacitor/device";
+import {Directory, Encoding, Filesystem} from "@capacitor/filesystem";
+import {ElMessage} from "element-plus";
 
 export const openFileInBrowser = (accept: string | null): Promise<string | null > => new Promise((resolve) => {
   const link = document.createElement("input");
@@ -65,4 +68,41 @@ export const isMobile = () => {
     //@ts-ignore
   })(navigator.userAgent || navigator.vendor || window.opera);
   return check;
+}
+
+export const getDateTimeString = () => {
+  return new Date().toLocaleString('default', {hour12: false}).replaceAll('/', '_').replaceAll(',', '').replaceAll(':', '_').replaceAll(' ', '_');
+}
+
+export const saveFile = async (str: string, filename: string) => {
+  const info = await Device.getInfo();
+
+  if (info.platform == 'web') {
+    return saveFileInBrowser(str, filename);
+  }
+
+  let permission = await Filesystem.checkPermissions();
+  if (permission.publicStorage !== "granted") {
+    permission = await Filesystem.requestPermissions();
+    if (permission.publicStorage !== "granted") return ElMessage({
+      message: 'Нет необходимых разрешений',
+      type: 'error',
+      showClose: true,
+    })
+  }
+
+  Filesystem.writeFile({
+    path: '/../Download/' + filename,
+    data: str,
+    directory: Directory.Documents,
+    encoding: Encoding.UTF8
+  }).then((res) => {
+    console.log(res)
+
+    ElMessage({
+      message: 'Бекап сохранен',
+      type: 'success',
+      showClose: true,
+    })
+  });
 }

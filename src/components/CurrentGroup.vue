@@ -35,7 +35,7 @@ const addEstToStudent = (key: number, data: any) => {
 const initCalendar = (id: CollapseModelValue) => {
   switch (typeof id) {
     case "number": return renderKeys.value[id]++;
-    case "object": return id.forEach(i => renderKeys.value[i]++);
+    case "object": return id.forEach((i: number | string) => renderKeys.value[i as number]++);
   }
 }
 

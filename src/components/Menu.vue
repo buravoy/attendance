@@ -3,10 +3,8 @@ import {shallowRef} from "vue";
 import {ElButton, ElSwitch, ElDrawer, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Download, List, Operation, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser, merge, jsonToBase64, isMobile} from "../helpers.ts";
-import {Directory, Filesystem} from "@capacitor/filesystem";
-import {Share} from "@capacitor/share";
-import {writeFileXLSX} from "xlsx";
+import {openFileInBrowser, merge, jsonToBase64, isMobile, saveFileInBrowser, getDateTimeString, saveFile} from "../helpers.ts";
+import {writeFileXLSX, writeXLSX} from "xlsx";
 
 const store = useStore();
 const isShow = shallowRef(false);
@@ -22,46 +20,21 @@ const onClose = () => {
   store.isStart = true;
 }
 
-const exportData = () => {
+const exportData = async () => {
   const {groups, order} = store;
-  const filename = 'attendance_backup_' + new Date().toDateString().replaceAll(' ', '_') + '.json';
+  const filename = 'progulschik_backup_' + getDateTimeString() + '.json';
   const json = JSON.stringify({groups, order});
-  const data = jsonToBase64(json);
-
-  Filesystem.writeFile({
-    path: filename,
-    data: data,
-    directory: Directory.Cache
-  }).then(() => {
-    return Filesystem.getUri({
-      directory: Directory.Cache,
-      path: filename
-    });
-  }).then((uriResult) => {
-    return Share.share({
-      title: filename,
-      text: filename,
-      url: uriResult.uri,
-    });
-  }).then(() => {
-    ElMessage({
-      message: 'Данные отправлены',
-      type: 'success',
-      showClose: true,
-    })
-  });
-
+  await saveFile(json, filename);
   isShow.value = false;
 }
 
 const importData = async () => {
   try {
-    const json = await openFileInBrowser('.json');
-    const file = JSON.parse(json!);
+    const file = await openFileInBrowser('.json');
     const {groups, order} = JSON.parse(file!)
     Object.assign(store.groups, groups);
     store.order = merge(store.order, order);
-    store.keys = store.order;
+    store.keys = JSON.parse(JSON.stringify(store.order));
     await store.fullSync();
     isShow.value = false;
 
@@ -92,8 +65,8 @@ const changeSync = (val: boolean) => {
   return val ? localStorage.setItem('sync', '1') : localStorage.removeItem('sync');
 }
 
-const exportToCSV = () => {
-  const filename = 'attendance_export_' + new Date().toDateString().replaceAll(' ', '_') + '.xlsx';
+const exportToXLS = async () => {
+  const filename = 'progulschik_export_' +  getDateTimeString() + '.xlsx';
   let Sheets: any = {};
 
   const SheetNames = store.order.map((i: string) => {
@@ -129,7 +102,6 @@ const exportToCSV = () => {
       }
     }
 
-
     return meta.name
   });
 
@@ -138,8 +110,9 @@ const exportToCSV = () => {
     SheetNames
   }
 
-  writeFileXLSX(workBook, filename + '.xlsx');
-
+  const data = writeXLSX(workBook, {type: "array"});
+  await saveFile(data, filename);
+  isShow.value = false;
 }
 </script>
 
@@ -170,7 +143,7 @@ const exportToCSV = () => {
                      @change="changeSync as any"
           />
 
-          <el-button type="primary" size="large"  :icon="List" @click="exportToCSV">Экспорт в CSV</el-button>
+          <el-button type="primary" size="large"  :icon="List" @click="exportToXLS">Экспорт в Excel</el-button>
 
           <div class="divider"></div>
 

@@ -19,42 +19,42 @@ const deleteGroup = () => {
 </script>
 
 <template>
-  <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}"
-       :style="{backgroundColor: data?.meta?.color, color: getColorByBgColor(data?.meta?.color)}">
+  <div>
+    <div class="group-item mx-3" :class="{bordered: !data?.meta?.color}"
+         :style="{backgroundColor: data?.meta?.color, color: getColorByBgColor(data?.meta?.color)}">
 
-    <div class="group-info" @click="emit('open')">
-      <p class="title">{{data?.meta?.name}}</p>
-      <p class="desc mb-1">{{data?.meta?.desc}}</p>
-      <p class="count"><span class="count-desc me-1">Студентов в группе:</span> <b>{{data?.students?.length}}</b></p>
+      <div class="group-info" @click="emit('open')">
+        <p class="title">{{data?.meta?.name}}</p>
+        <p class="desc mb-1">{{data?.meta?.desc}}</p>
+        <p class="count"><span class="count-desc me-1">Студентов в группе:</span> <b>{{data?.students?.length}}</b></p>
+      </div>
+
+      <el-dropdown placement="top-start" class="ms-auto" trigger="click">
+        <div class="group-control" :style="{color: getColorByBgColor(data?.meta?.color)}">
+          <MoreFilled class="icon" size="24"/>
+        </div>
+
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="emit('edit')" :icon="Edit">Редактировать</el-dropdown-item>
+            <el-dropdown-item @click="centerDialogVisible = true" :icon="Delete" divided style="color: var(--el-color-error)">Удалить группу</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
+
     </div>
 
-    <el-dropdown placement="top-start" class="ms-auto" trigger="click">
-      <div class="group-control" :style="{color: getColorByBgColor(data?.meta?.color)}">
-        <MoreFilled class="icon" size="24"/>
-      </div>
-
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="emit('edit')" :icon="Edit">Редактировать</el-dropdown-item>
-          <el-dropdown-item @click="centerDialogVisible = true" :icon="Delete" divided style="color: var(--el-color-error)">Удалить группу</el-dropdown-item>
-        </el-dropdown-menu>
+    <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center style="max-width: 300px">
+      <div class="text-center" style="line-height: 28px">Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">Отмена</el-button>
+          <el-button type="danger" @click="deleteGroup">Удалить</el-button>
+        </div>
       </template>
-    </el-dropdown>
-
-
+    </el-dialog>
   </div>
-  <el-dialog v-model="centerDialogVisible" title="Внимание" destroy-on-close center style="max-width: 300px">
-    <div class="text-center" style="line-height: 28px">Удалить группу <strong>{{data?.meta?.name}}</strong> со всеми студентами?</div>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">Отмена</el-button>
-        <el-button type="danger" @click="deleteGroup">Удалить</el-button>
-      </div>
-    </template>
-  </el-dialog>
-
-
-
 </template>
 
 <style scoped lang="scss">
