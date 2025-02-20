@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": " vite build",
     "preview": "vite preview",
-    "tsc": "vue-tsc -b"
+    "tsc": "vue-tsc -b",
+    "win": "electron ."
   },
   "dependencies": {
     "@capacitor/android": "^7.0.1",
@@ -35,6 +36,7 @@
     "@capacitor/cli": "^7.0.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
+    "electron": "^34.2.0",
     "sass-embedded": "^1.83.4",
     "typescript": "~5.7.3",
     "vite": "^6.1.0",
