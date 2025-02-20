@@ -72,7 +72,11 @@ const exportToXLS = async () => {
 
   const SheetNames = store.order.map((i: string) => {
     const {meta, students} = store.groups[i];
-    Sheets[meta.name] = {'!ref': 'A1:B9999'};
+    Sheets[meta.name] = {
+      '!ref': 'A1:B9999',
+      '!cols': [{wpx: 300}, {wpx: 600}],
+      '!rows': []
+    };
 
     for (const s of students) {
       const s_i: number = students.indexOf(s) + 1;
@@ -89,11 +93,18 @@ const exportToXLS = async () => {
       });
 
       let count = 1;
+      let hpx = 19;
+
+
 
       for (const a of sortedAttendance) {
         att_val += `${a}: ${attendance[a].join(', ')} ${count == sortedAttendance.length ? '' : '\n'}`;
+
+        if (count > 1 && count <= sortedAttendance.length) hpx += 12;
         count++
       }
+
+      Sheets[meta.name]['!rows'].push({hpx});
 
       Sheets[meta.name][name] = {
         v: `${s.surname} ${s.name} ${s.patroname}`
