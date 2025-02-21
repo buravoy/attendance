@@ -3,7 +3,7 @@ import {shallowRef} from "vue";
 import {ElButton, ElSwitch, ElDrawer, ElMessage} from "element-plus";
 import {useStore} from "../stores";
 import {Download, List, Operation, Upload} from "@element-plus/icons-vue";
-import {openFileInBrowser, merge, isMobile, getDateTimeString, saveFile, saveFileInBrowser} from "../helpers.ts";
+import {openFileInBrowser, merge, isMobile, getDateTimeString, saveFile} from "../helpers.ts";
 import {writeXLSX} from "xlsx";
 import {Device} from "@capacitor/device";
 import {Encoding} from "@capacitor/filesystem";
@@ -61,16 +61,11 @@ const changeTheme = (val: boolean) => {
 }
 
 const changeMulti = (val: boolean) => {
-  if (val) {
-    store.calendarSync = false;
-  }
-
+  if (val) store.calendarSync = false;
   return val ? localStorage.setItem('multi', '1') : localStorage.removeItem('multi');
 }
 
 const changeSync = (val: boolean) => {
-
-
   return val ? localStorage.setItem('sync', '1') : localStorage.removeItem('sync');
 }
 
@@ -92,7 +87,7 @@ const exportToXLS = async () => {
       const att = 'B' + s_i;
       const {attendance} = s;
 
-      let att_val = '';
+      let att_val = [];
 
       const sortedAttendance = Object.keys(attendance).sort((a: string, b: string) => {
         const _a = a.split('.');
@@ -100,42 +95,22 @@ const exportToXLS = async () => {
         return new Date(+_a[2], +_a[1] - 1, +_a[0]).getTime() - new Date(+_b[2], +_b[1] - 1, +_b[0]).getTime()
       });
 
-      let count = 1;
-      let hpx = 19;
-
-
-
       for (const a of sortedAttendance) {
-        att_val += `${a}: ${attendance[a].join(', ')} ${count == sortedAttendance.length ? '' : '\n'}`;
-
-        if (count > 1 && count <= sortedAttendance.length) hpx += 12;
-        count++
+        for (const i of attendance[a]) {
+          att_val.push(i);
+        }
       }
 
-      Sheets[meta.name]['!rows'].push({hpx});
-
-      Sheets[meta.name][name] = {
-        v: `${s.surname} ${s.name} ${s.patroname}`
-      }
-      Sheets[meta.name][att] = {
-        v: att_val
-      }
+      Sheets[meta.name]['!rows'].push({hpx: 16});
+      Sheets[meta.name][name] = { v: `${s.surname} ${s.name} ${s.patroname}`};
+      Sheets[meta.name][att] = { v: att_val.join(', ') };
     }
 
     return meta.name
   });
 
-  const workBook = {
-    Sheets,
-    SheetNames
-  }
-
   const info = await Device.getInfo();
-
-  const data = writeXLSX(workBook, {
-    type: info.platform == 'web' ? "array" : "base64"
-  });
-
+  const data = writeXLSX({ Sheets, SheetNames }, { type: info.platform == 'web' ? "array" : "base64" });
   await saveFile(data, filename);
   isShow.value = false;
 }
